@@ -15,7 +15,7 @@ type Report = { grade: string; score: number; verdict: string; reason: string; p
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 /** Buy the paid x402 credit report from the browser: Phantom pays the pool, the server verifies on-chain. */
-export function BuyReport({ mint, priceUsd }: { mint: string; priceUsd: number }) {
+export function BuyReport({ mint, priceUsd, solUsd }: { mint: string; priceUsd: number; solUsd: number }) {
   const [step, setStep] = useState<'idle' | 'quote' | 'sign' | 'verify' | 'done'>('idle');
   const [error, setError] = useState('');
   const [report, setReport] = useState<Report | null>(null);
@@ -60,7 +60,7 @@ export function BuyReport({ mint, priceUsd }: { mint: string; priceUsd: number }
     }
   }
 
-  const label = { idle: `Buy verified report · $${priceUsd.toFixed(2)} in SOL`, quote: 'Getting quote…', sign: 'Approve in your wallet…', verify: 'Verifying on-chain…', done: 'Buy another' }[step];
+  const label = { idle: `Buy verified report · $${priceUsd.toFixed(2)}${solUsd ? ` (about ${(priceUsd / solUsd).toFixed(5)} SOL)` : ''}`, quote: 'Getting quote…', sign: 'Approve in your wallet…', verify: 'Verifying on-chain…', done: 'Buy another' }[step];
 
   return (
     <div>

@@ -1,0 +1,7 @@
+{
+  "name": "Tokenline",
+  "description": "Credit scores and pay-later AI compute for Solana agents: vet any Clawrena agent by its on-chain fees, check your line, think on credit and repay on-chain.",
+  "author": "angelraph",
+  "tags": ["defi", "risk", "analysis", "utility"],
+  "version": "1.0.0"
+}

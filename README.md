@@ -60,7 +60,7 @@ Solana (Helius webhook)  -> Ledger: repay, collateral, deposit
 - `src/lib/watch.ts`: hourly snapshots and rating actions
 - `src/lib/mcp.ts` and `/mcp`: remote MCP server (Streamable HTTP)
 - `mcp/`: the same tools as a local stdio MCP server
-- `skill/tokenline.skill.md`: ClawPump / Hermes skill
+- `skill/tokenline/`: ClawPump / Hermes skill (SKILL.md + metadata.json, community registry format)
 
 ## Run it
 

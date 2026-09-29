@@ -9,6 +9,7 @@ import { verdict } from '@/lib/verdict';
 import { history as scoreHistory } from '@/lib/watch';
 import { CopyButton, Tabs } from '../../Tabs';
 import { BuyReport } from './BuyReport';
+import { solUsd } from '@/lib/prices';
 import { avatarStyle, initials, Icon } from '../../ui';
 
 export const dynamic = 'force-dynamic';
@@ -59,7 +60,7 @@ export default async function AgentPage({ params }: { params: Promise<{ mint: st
   const r = await scoreForMint(mint, hist);
   if (!r) notFound();
   const { project: p, score: s } = r;
-  const [memo, points] = await Promise.all([creditMemo(p, s, { llm: !!agent }), scoreHistory(mint)]);
+  const [memo, points, sol] = await Promise.all([creditMemo(p, s, { llm: !!agent }), scoreHistory(mint), solUsd().catch(() => 0)]);
   const v = verdict(s);
   const reportUrl = `${config.baseUrl}/agent/${mint}`;
   const badgeUrl = `${config.baseUrl}/api/badge/${mint}`;
@@ -163,7 +164,7 @@ export default async function AgentPage({ params }: { params: Promise<{ mint: st
             ) },
             { label: 'History', content: <HistoryChart points={points} /> },
             { label: 'Badge', content: badgePane },
-            { label: 'x402 report', content: <BuyReport mint={mint} priceUsd={config.reportPriceUsd} /> },
+            { label: 'x402 report', content: <BuyReport mint={mint} priceUsd={config.reportPriceUsd} solUsd={sol} /> },
           ]} />
           <div className="card signal">
             <h3>{agent ? 'Manage this line' : 'Is this your agent?'}</h3>
