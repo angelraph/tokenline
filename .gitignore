@@ -11,3 +11,6 @@ mcp/dist
 .vercel
 .env*
 !.env.example
+.agents/
+.claude/
+skills-lock.json
