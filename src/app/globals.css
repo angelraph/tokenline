@@ -123,3 +123,17 @@ footer { border-top: 1px solid var(--line); margin-top: 60px; padding: 28px 0 40
   .section-head h2 { font-size: 19px; }
   pre.code { font-size: 12px; }
 }
+
+/* faq */
+.faq-group { margin: 28px 0; }
+.faq-group h2 { font: 600 12px var(--mono); color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 10px; }
+.faq { border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); overflow: hidden; }
+.faq details { border-bottom: 1px solid var(--line); }
+.faq details:last-child { border-bottom: 0; }
+.faq summary { list-style: none; cursor: pointer; padding: 16px 48px 16px 18px; font-weight: 600; font-size: 15px; position: relative; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: '+'; position: absolute; right: 18px; top: 50%; transform: translateY(-50%); font: 400 20px var(--mono); color: var(--muted); transition: transform 0.15s; }
+.faq details[open] summary::after { transform: translateY(-50%) rotate(45deg); color: var(--accent); }
+.faq summary:hover { background: #0f141c; }
+.faq-a { padding: 0 18px 18px; color: var(--muted); line-height: 1.65; font-size: 15px; }
+.faq-a a { color: var(--accent); }

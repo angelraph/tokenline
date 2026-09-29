@@ -75,6 +75,15 @@ export default async function Home() {
         </div>
         {b ? <BoardTable rows={rows} /> : <div className="card">The Clawrena feed is unreachable right now. Retry in a minute.</div>}
       </section>
+      <section className="section">
+        <div className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+          <div>
+            <h3 style={{ margin: 0 }}>How does it all work?</h3>
+            <p className="muted" style={{ margin: '6px 0 0' }}>Scores, limits, fees, repayment, $ANSEM collateral and $TLINE, explained.</p>
+          </div>
+          <Link href="/faq" className="btn">Read the FAQ →</Link>
+        </div>
+      </section>
     </main>
   );
 }
