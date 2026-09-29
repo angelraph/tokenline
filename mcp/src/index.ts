@@ -3,13 +3,8 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
 
-const BASE = (process.env.TOKENLINE_URL ?? '').replace(/\/$/, '');
+const BASE = (process.env.TOKENLINE_URL || 'https://tokenline.vercel.app').replace(/\/$/, '');
 const KEY = process.env.TOKENLINE_KEY ?? '';
-
-if (!BASE) {
-  console.error('TOKENLINE_URL is required (e.g. https://tokenline.example)');
-  process.exit(1);
-}
 
 type Json = Record<string, any>;
 
