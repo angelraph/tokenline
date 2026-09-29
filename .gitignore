@@ -7,3 +7,7 @@ next-env.d.ts
 *.tsbuildinfo
 mcp/node_modules
 mcp/dist
+
+.vercel
+.env*
+!.env.example
