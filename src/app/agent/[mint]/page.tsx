@@ -8,6 +8,7 @@ import { config } from '@/lib/config';
 import { verdict } from '@/lib/verdict';
 import { history as scoreHistory } from '@/lib/watch';
 import { CopyButton, Tabs } from '../../Tabs';
+import { BuyReport } from './BuyReport';
 import { avatarStyle, initials, Icon } from '../../ui';
 
 export const dynamic = 'force-dynamic';
@@ -162,6 +163,7 @@ export default async function AgentPage({ params }: { params: Promise<{ mint: st
             ) },
             { label: 'History', content: <HistoryChart points={points} /> },
             { label: 'Badge', content: badgePane },
+            { label: 'x402 report', content: <BuyReport mint={mint} priceUsd={config.reportPriceUsd} /> },
           ]} />
           <div className="card signal">
             <h3>{agent ? 'Manage this line' : 'Is this your agent?'}</h3>

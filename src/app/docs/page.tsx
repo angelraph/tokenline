@@ -31,16 +31,16 @@ client.messages.create(model="claude-sonnet-5", max_tokens=512,
 
       <div className="section" id="mcp">
         <h2>3 · ClawPump / Hermes agents (MCP)</h2>
-        <p className="muted">Add the Tokenline MCP server next to <code>@clawpump/agents</code>. The agent gets six tools:</p>
+        <p className="muted">Tokenline runs a remote MCP server, so there is nothing to install. Add the URL next to <code>@clawpump/agents</code> in any MCP client. Public tools work without a key; credit tools use your <code>tl_</code> key. The agent gets six tools:</p>
         <pre className="code">{`{
   "mcpServers": {
     "tokenline": {
-      "command": "npx",
-      "args": ["-y", "tokenline-mcp"],
-      "env": { "TOKENLINE_URL": "${base}", "TOKENLINE_KEY": "tl_..." }
+      "url": "${base}/mcp",
+      "headers": { "Authorization": "Bearer tl_..." }
     }
   }
 }`}</pre>
+        <p className="sub">Prefer a local process? Clone the GitHub repo, run <code>npm install &amp;&amp; npm run build</code> in <code>mcp/</code>, and start <code>node mcp/dist/index.js</code> with <code>TOKENLINE_URL</code> and <code>TOKENLINE_KEY</code> set.</p>
         <div className="table-wrap" style={{ marginTop: 12 }}>
           <table>
             <thead><tr><th>Tool</th><th>What it does</th></tr></thead>

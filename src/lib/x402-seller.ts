@@ -40,6 +40,9 @@ function openQuote(quoteId: string, resource: string) {
 const rpcUrl = () =>
   config.heliusKey ? `https://mainnet.helius-rpc.com/?api-key=${config.heliusKey}` : 'https://api.mainnet-beta.solana.com';
 
+/** Memo a browser buyer attaches to its payment, binding the transfer to one quote. */
+export const quoteMemo = (quoteId: string) => `tl:${(quoteId.split('.')[1] ?? '').slice(0, 16)}`;
+
 export type Settlement = { ok: true; payer: string; signature: string; lamports: number } | { ok: false; reason: string };
 
 /** Verify a PAYMENT-SIGNATURE header against the chain and burn the signature. */
@@ -61,12 +64,15 @@ export async function settle(header: string, resource: string): Promise<Settleme
     return info.source === p.payer_wallet && info.destination === config.poolWallet && info.lamports >= q.lamports;
   });
   if (!paid) return { ok: false, reason: 'transaction does not pay the quoted amount to the pool' };
+  // A memo matching this quote proves the payer built the transfer for this purchase.
+  const memoMatches = tx.transaction.message.instructions.some((ix) =>
+    'parsed' in ix && ix.program === 'spl-memo' && ix.parsed === quoteMemo(p.quote_id!));
 
   // If the chain sync saw this transfer first it was booked as a deposit/repay; rebook it as a sale.
   for (const e of await store.eventsForSignature(p.signature)) {
     if (e.type === 'sale') return { ok: false, reason: 'payment already used' };
-    // A transfer already credited to an agent's line stays a repayment; never re-purpose it.
-    if (e.type !== 'deposit') return { ok: false, reason: 'transaction was already credited as a repayment' };
+    // A transfer already credited to an agent's line stays a repayment unless the payer tagged it for this quote.
+    if (e.type !== 'deposit' && !memoMatches) return { ok: false, reason: 'transaction was already credited as a repayment' };
     await store.deleteEvent(e.id);
   }
   // One payment buys one report: the signature is burned in the ledger.

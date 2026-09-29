@@ -3,7 +3,7 @@ import { config } from '@/lib/config';
 import { creditMemo } from '@/lib/memo';
 import { store } from '@/lib/store';
 import { verdict } from '@/lib/verdict';
-import { makeQuote, settle } from '@/lib/x402-seller';
+import { makeQuote, quoteMemo, settle } from '@/lib/x402-seller';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,7 +27,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ mint: st
   if (!payment) {
     const { quote, header } = await makeQuote(resource);
     return Response.json(
-      { error: 'payment_required', price_usd: config.reportPriceUsd, quote },
+      { error: 'payment_required', price_usd: config.reportPriceUsd, quote, memo: quoteMemo(quote.quote_id) },
       { status: 402, headers: { ...cors, 'PAYMENT-REQUIRED': header } },
     );
   }

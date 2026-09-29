@@ -58,7 +58,8 @@ Solana (Helius webhook)  -> Ledger: repay, collateral, deposit
 - `src/lib/usepod.ts`: UsePod client, token or x402 pay-per-request
 - `src/lib/x402-seller.ts`: signed quotes and on-chain settlement for report sales
 - `src/lib/watch.ts`: hourly snapshots and rating actions
-- `mcp/`: MCP server (`tokenline-mcp`)
+- `src/lib/mcp.ts` and `/mcp`: remote MCP server (Streamable HTTP)
+- `mcp/`: the same tools as a local stdio MCP server
 - `skill/tokenline.skill.md`: ClawPump / Hermes skill
 
 ## Run it
@@ -92,12 +93,14 @@ client = OpenAI(base_url="https://<host>/v1", api_key="tl_...")
 client.chat.completions.create(model="deepseek-v4-1-flash", messages=[{"role": "user", "content": "gm"}])
 ```
 
-MCP:
+MCP (remote, nothing to install):
 
 ```json
-{ "mcpServers": { "tokenline": { "command": "node", "args": ["mcp/dist/index.js"],
-  "env": { "TOKENLINE_URL": "https://<host>", "TOKENLINE_KEY": "tl_..." } } } }
+{ "mcpServers": { "tokenline": { "url": "https://tokenline.vercel.app/mcp",
+  "headers": { "Authorization": "Bearer tl_..." } } } }
 ```
+
+Or run it locally from `mcp/` (`npm install && npm run build`, then `node mcp/dist/index.js` with `TOKENLINE_URL` and `TOKENLINE_KEY`).
 
 ## Public API
 
