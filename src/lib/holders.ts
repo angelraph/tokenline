@@ -33,15 +33,23 @@ export async function holderShare(mint: string): Promise<number | undefined> {
   return v;
 }
 
-/** Measure up to `max` mints that have no fresh value, a few at a time. */
-export async function refreshHolders(mints: string[], max = 25) {
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/**
+ * Measure mints that have no fresh value, one at a time. The largest-accounts RPC call is
+ * heavily rate limited, so requests are spaced, retried once, and bounded by a time budget.
+ */
+export async function refreshHolders(mints: string[], max = 25, budgetMs = 8_000) {
   const cache = await holderCache();
   const todo = mints.filter((m) => freshShare(cache, m) === undefined).slice(0, max);
   const updates: Record<string, Entry> = {};
-  for (let i = 0; i < todo.length; i += 5) {
-    const batch = todo.slice(i, i + 5);
-    const vals = await Promise.all(batch.map((m) => top10Share(m).catch(() => undefined)));
-    batch.forEach((m, j) => { if (vals[j] !== undefined) updates[m] = { v: vals[j]!, at: Date.now() }; });
+  const deadline = Date.now() + budgetMs;
+  for (const m of todo) {
+    if (Date.now() > deadline) break;
+    let v = await top10Share(m).catch(() => undefined);
+    if (v === undefined && Date.now() + 1500 < deadline) { await sleep(1200); v = await top10Share(m).catch(() => undefined); }
+    if (v !== undefined) updates[m] = { v, at: Date.now() };
+    await sleep(250);
   }
   await save(updates);
   return Object.keys(updates).length;

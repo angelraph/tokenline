@@ -15,7 +15,7 @@ async function run(req: Request) {
   try {
     const chain = await syncOnchain();
     const feed = await getClawrena();
-    const holdersMeasured = await refreshHolders(feed.projects.map((p) => p.mint), 250);
+    const holdersMeasured = await refreshHolders(feed.projects.map((p) => p.mint), 250, 45_000);
     return ok({ ...chain, holdersMeasured });
   } catch (e) {
     return fail(502, (e as Error).message);
