@@ -17,6 +17,7 @@
     "@modelcontextprotocol/sdk": "^1.31.0",
     "@solana/spl-token": "^0.4.15",
     "@solana/web3.js": "^1.99.0",
+    "@vercel/functions": "^3.9.9",
     "bs58": "^6.0.0",
     "buffer": "^6.0.3",
     "next": "^15.5.26",

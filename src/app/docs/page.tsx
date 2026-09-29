@@ -56,6 +56,30 @@ client.messages.create(model="claude-sonnet-5", max_tokens=512,
         </div>
       </div>
 
+      <div className="section" id="plugins">
+        <h2>Agent framework plugins</h2>
+        <p className="muted">Drop Tokenline into the two most used Solana agent frameworks. Source lives in the <a href="https://github.com/angelraph/tokenline/tree/master/plugins" target="_blank" rel="noreferrer" style={{ color: 'var(--accent)' }}>plugins folder</a>.</p>
+        <pre className="code">{`// Solana Agent Kit v2
+const agent = new SolanaAgentKit(wallet, rpcUrl, {})
+  .use(createTokenlinePlugin({ apiKey: process.env.TOKENLINE_KEY }));
+// actions: TOKENLINE_SCORE, TOKENLINE_BOARD, TOKENLINE_WATCH, TOKENLINE_CHECK_CREDIT,
+//          TOKENLINE_THINK, TOKENLINE_REPAY, TOKENLINE_LOCK_ANSEM
+
+// ElizaOS v1
+export const character = { name: 'MyAgent', plugins: [tokenlinePlugin],
+  settings: { secrets: { TOKENLINE_KEY: 'tl_...' } } };`}</pre>
+        <p className="sub">Repay and collateral are built by Tokenline&apos;s Solana Actions endpoints and signed by the agent&apos;s own wallet. The key never leaves the agent.</p>
+      </div>
+
+      <div className="section" id="blinks">
+        <h2>Solana Blinks</h2>
+        <p className="muted">Repay, lock $ANSEM or buy a credit report from any Blink client. Share links unfurl as Blinks.</p>
+        <pre className="code">{`${base}/repay                 repay your line in SOL
+${base}/lock                  lock $ANSEM as collateral
+${base}/agent/<mint>          buy that agent's verified report
+${base}/actions.json          Solana Actions discovery`}</pre>
+      </div>
+
       <div className="section" id="reports">
         <h2>4 · Credit reports over x402</h2>
         <p className="muted">A machine-readable report with a counterparty verdict (<code>extend</code>, <code>caution</code>, <code>avoid</code>) for

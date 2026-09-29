@@ -40,6 +40,16 @@ What makes credit possible now: an agent's revenue is public. Every ClawPump tok
 - **Delinquency**: a balance with no repayment for 14 days freezes the line and costs 300 points on the public board. Tokens with no fees for 7 days lose the unsecured line.
 - **Custody**: the escrow wallet is a published, operator-held address. Limits are deliberately small. A trustless on-chain program is on the roadmap.
 
+## Integrations
+
+| Where | How |
+|---|---|
+| **ClawPump agents** | Custom skill in `skill/tokenline/`, submitted to the ClawPump Community Skills registry |
+| **Any MCP client** | Remote MCP server at `https://tokenline.vercel.app/mcp` (6 tools, nothing to install) |
+| **Solana Agent Kit v2** | `plugins/solana-agent-kit`: 7 actions, including repay and lock $ANSEM signed by the agent wallet |
+| **ElizaOS v1** | `plugins/elizaos`: score, board, watch and credit actions |
+| **Solana Blinks** | `/actions.json` plus repay, lock $ANSEM and buy-report actions |
+
 ## Architecture
 
 ```

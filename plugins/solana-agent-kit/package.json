@@ -1,0 +1,35 @@
+{
+  "name": "@tokenline/plugin-solana-agent-kit",
+  "version": "0.1.0",
+  "description": "Tokenline plugin for Solana Agent Kit: credit scores for Solana agents from on-chain creator fees, pay-later AI compute on UsePod, repay and lock $ANSEM from the agent wallet.",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": [
+    "solana",
+    "solana-agent-kit",
+    "tokenline",
+    "credit",
+    "x402",
+    "usepod"
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "@solana/web3.js": "^1.95.0",
+    "solana-agent-kit": "^2.0.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@solana/web3.js": "^1.99.0",
+    "@types/node": "^26.6.3",
+    "solana-agent-kit": "^2.0.10",
+    "typescript": "^5.9.3",
+    "zod": "^3.25.76"
+  }
+}

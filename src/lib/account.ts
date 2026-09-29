@@ -1,6 +1,7 @@
 import { config } from './config';
 import { findProject } from './clawrena';
-import { tokenBalance, top10Share } from './helius';
+import { tokenBalance } from './helius';
+import { holderShare } from './holders';
 import { assetUsd } from './prices';
 import { scoreAgent, type ScoreResult } from './score';
 import { store, type Agent, type LedgerEvent } from './store';
@@ -49,7 +50,7 @@ export function tally(events: LedgerEvent[]) {
 export async function scoreForMint(mint: string, history?: { drawnUsd: number; repaidUsd: number; overdue: boolean }) {
   const { feed, project } = await findProject(mint);
   if (!project) return null;
-  const top10 = await top10Share(mint);
+  const top10 = await holderShare(mint);
   return {
     project,
     score: scoreAgent({ ...project, solPriceUsd: feed.solPriceUsd, top10Share: top10, history }, config.policy),

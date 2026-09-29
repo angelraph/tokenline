@@ -1,0 +1,31 @@
+{
+  "name": "@tokenline/plugin-elizaos",
+  "version": "0.1.0",
+  "description": "Tokenline plugin for ElizaOS: credit scores for Solana agents from on-chain creator fees, and the agent's own pay-later compute line.",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": [
+    "elizaos",
+    "eliza",
+    "plugin",
+    "solana",
+    "tokenline",
+    "credit"
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "@elizaos/core": "^1.0.0"
+  },
+  "devDependencies": {
+    "@elizaos/core": "^1.7.2",
+    "@types/node": "^26.6.3",
+    "typescript": "^5.9.3"
+  }
+}

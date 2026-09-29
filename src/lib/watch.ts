@@ -6,7 +6,8 @@ import { store } from './store';
 
 type Snapshot = { at: number; s: Record<string, [number, number]> }; // mint -> [score, lineUsd]
 
-const KEY = 'watch:snapshots';
+// v2: scores include measured holder concentration, so history restarts under the new method.
+const KEY = 'watch:snapshots:v2';
 const EVERY_MS = 3_600_000;
 const KEEP_MS = 8 * 86_400_000;
 
