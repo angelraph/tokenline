@@ -29,6 +29,6 @@ export function CountUp({ value, prefix = '', decimals = 0, duration = 1600 }: {
     return () => { io.disconnect(); cancelAnimationFrame(raf); };
   }, [value, duration]);
 
-  const text = shown.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+  const text = shown.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
   return <span ref={ref}>{prefix}{text}</span>;
 }

@@ -26,6 +26,13 @@ export function MotionLayer() {
     }, { rootMargin: '0px 0px -10% 0px', threshold: 0.12 });
     els.forEach((el) => io.observe(el));
 
+    // Pause heavy looping animations (radar, ticker, glows) while they are off screen.
+    const loops = [...document.querySelectorAll<HTMLElement>('[data-loop]')];
+    const lo = new IntersectionObserver((entries) => {
+      for (const e of entries) e.target.classList.toggle('paused', !e.isIntersecting);
+    });
+    loops.forEach((el) => lo.observe(el));
+
     const onMove = (ev: PointerEvent) => {
       const card = (ev.target as HTMLElement | null)?.closest?.('.product') as HTMLElement | null;
       if (!card) return;
@@ -37,6 +44,7 @@ export function MotionLayer() {
 
     return () => {
       io.disconnect();
+      lo.disconnect();
       document.removeEventListener('pointermove', onMove);
     };
   }, [pathname]);

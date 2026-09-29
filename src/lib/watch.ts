@@ -51,3 +51,23 @@ export async function movers(rows: BoardRow[], hours = 24) {
   moves.sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
   return { since: base.at, moves };
 }
+
+/** Score change per mint versus the snapshot closest to `hours` ago (null when no history yet). */
+export async function deltas(rows: BoardRow[], hours = 24): Promise<{ since: number | null; byMint: Record<string, number> }> {
+  const snaps = (await store.getKv<Snapshot[]>(KEY)) ?? [];
+  if (!snaps.length) return { since: null, byMint: {} };
+  const target = Date.now() - hours * 3_600_000;
+  const base = snaps.reduce((best, x) => (Math.abs(x.at - target) < Math.abs(best.at - target) ? x : best), snaps[0]);
+  const byMint: Record<string, number> = {};
+  for (const r of rows) {
+    const prev = base.s[r.mint];
+    if (prev) byMint[r.mint] = r.score - prev[0];
+  }
+  return { since: base.at, byMint };
+}
+
+/** Score history for one mint from the hourly snapshots, oldest first. */
+export async function history(mint: string): Promise<{ at: number; score: number }[]> {
+  const snaps = (await store.getKv<Snapshot[]>(KEY)) ?? [];
+  return snaps.filter((s) => s.s[mint]).map((s) => ({ at: s.at, score: s.s[mint][0] }));
+}
