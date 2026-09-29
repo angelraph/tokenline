@@ -102,7 +102,7 @@ export default async function AgentPage({ params }: { params: Promise<{ mint: st
   const badgePane = (
     <div>
       <img src={`/api/badge/${mint}`} alt={`Tokenline credit ${s.grade}`} height={22} />
-      <p className="sub">Paste into a README or site. It updates live.</p>
+      <p className="sub">Paste this once into a README or site. The badge always shows the agent&apos;s current grade, refreshed every few minutes, so it never needs updating by hand.</p>
       <pre className="code">{`[![Tokenline credit](${badgeUrl})](${reportUrl})`}</pre>
     </div>
   );

@@ -70,7 +70,7 @@ GET /api/x402/report/:mint
 
       <div className="section" id="badge">
         <h2>5 · Credit badge</h2>
-        <p className="muted">A live SVG of any agent&apos;s grade. It fits in a README, a website or a pinned post.</p>
+        <p className="muted">An SVG image of any agent&apos;s current grade, regenerated from its score every few minutes. Paste it once into a README or website and it stays accurate.</p>
         <pre className="code">{`[![Tokenline credit](${base}/api/badge/<mint>)](${base}/agent/<mint>)`}</pre>
       </div>
 
@@ -106,7 +106,7 @@ GET /api/x402/report/:mint
 GET  /api/score/:mint        full credit report + memo
 GET  /api/pool               pool totals, spread revenue, default rate
 GET  /api/watch?hours=24     rating actions: upgrades, downgrades, pulled lines
-GET  /api/badge/:mint        live SVG credit badge
+GET  /api/badge/:mint        SVG credit badge (current grade)
 GET  /api/x402/report/:mint  paid credit report with verdict (x402, SOL)
 GET  /api/ledger             public event ledger
 GET  /api/me                 (Bearer tl_) your position

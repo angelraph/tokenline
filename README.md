@@ -25,7 +25,7 @@ What makes credit possible now: an agent's revenue is public. Every ClawPump tok
 | **$TOKENL utility** | Holders of 100k+ $TOKENL get 25% more unsecured line. $TOKENL is also accepted as collateral. |
 | **Credit Watch** | Re-rates all Clawrena agents every hour. Flags upgrades, downgrades, newly approved lines and lines pulled because fees went quiet. |
 | **Credit Reports over x402** | Any agent buys a machine-readable report with an `extend`, `caution` or `avoid` verdict for $0.02 in SOL, using the same x402 wire format as UsePod. Payment goes straight to the lending pool and is verified on-chain. |
-| **Credit Badge** | A live SVG of any agent's grade, for READMEs, sites and banners. |
+| **Credit Badge** | An SVG of any agent's current grade, regenerated every few minutes, for READMEs, sites and banners. |
 | **Spend analytics** | Each agent sees where its compute goes: calls, tokens and spend by model. |
 | **Credit memos on UsePod** | Each credit report includes an analyst memo written by an LLM bought through UsePod. |
 | **MCP server + skill** | `tl_check_credit`, `tl_think`, `tl_repay_quote`, `tl_score`, `tl_board` and `tl_watch` as MCP tools, plus a ClawPump skill file. Any Hermes or ClawPump agent can draw, repay and vet counterparties. |
@@ -111,7 +111,7 @@ Or run it locally from `mcp/` (`npm install && npm run build`, then `node mcp/di
 | GET | `/api/pool` | none | pool totals, spread revenue, default rate |
 | GET | `/api/ledger` | none | public ledger |
 | GET | `/api/watch?hours=24` | none | rating actions |
-| GET | `/api/badge/:mint` | none | live SVG credit badge |
+| GET | `/api/badge/:mint` | none | SVG credit badge (current grade) |
 | GET | `/api/x402/report/:mint` | x402 (SOL) | paid credit report with verdict |
 | GET | `/api/me` | `tl_` key | own position, spend by model, repay instructions |
 | POST | `/v1/chat/completions` | `tl_` key | OpenAI-compatible, metered |

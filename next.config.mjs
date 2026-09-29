@@ -8,5 +8,12 @@ const nextConfig = {
       { source: '/mcp', destination: '/api/mcp' },
     ];
   },
+  // Blink share links. Wallet-aware clients read /actions.json; browsers land on My line.
+  async redirects() {
+    return [
+      { source: '/repay', destination: '/account', permanent: false },
+      { source: '/lock', destination: '/account', permanent: false },
+    ];
+  },
 };
 export default nextConfig;
