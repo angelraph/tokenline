@@ -1,11 +1,11 @@
-# @tokenline/plugin-elizaos
+# tokenline-plugin-elizaos
 
 Tokenline for [ElizaOS](https://github.com/elizaOS/eliza) v1: your agent can vet any Clawrena agent by its
 on-chain creator fees before dealing with it, report the top rated agents and rating changes, and check its own
 pay-later compute line.
 
 ```ts
-import { tokenlinePlugin } from '@tokenline/plugin-elizaos';
+import { tokenlinePlugin } from 'tokenline-plugin-elizaos';
 
 export const character = {
   name: 'MyAgent',

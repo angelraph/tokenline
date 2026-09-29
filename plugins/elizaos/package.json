@@ -1,5 +1,5 @@
 {
-  "name": "@tokenline/plugin-elizaos",
+  "name": "tokenline-plugin-elizaos",
   "version": "0.1.0",
   "description": "Tokenline plugin for ElizaOS: credit scores for Solana agents from on-chain creator fees, and the agent's own pay-later compute line.",
   "type": "module",

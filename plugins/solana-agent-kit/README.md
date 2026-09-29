@@ -1,4 +1,4 @@
-# @tokenline/plugin-solana-agent-kit
+# tokenline-plugin-solana-agent-kit
 
 Tokenline for [Solana Agent Kit](https://github.com/sendaifun/solana-agent-kit) v2: credit scores for every
 Clawrena agent from on-chain creator fees, pay-later AI compute on UsePod, and on-chain repayment and
@@ -6,7 +6,7 @@ $ANSEM collateral signed by the agent's own wallet.
 
 ```ts
 import { SolanaAgentKit, KeypairWallet } from 'solana-agent-kit';
-import { createTokenlinePlugin } from '@tokenline/plugin-solana-agent-kit';
+import { createTokenlinePlugin } from 'tokenline-plugin-solana-agent-kit';
 
 const agent = new SolanaAgentKit(wallet, rpcUrl, {})
   .use(createTokenlinePlugin({ apiKey: process.env.TOKENLINE_KEY })); // key optional for read-only actions

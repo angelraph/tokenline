@@ -1,5 +1,5 @@
 {
-  "name": "@tokenline/plugin-solana-agent-kit",
+  "name": "tokenline-plugin-solana-agent-kit",
   "version": "0.1.0",
   "description": "Tokenline plugin for Solana Agent Kit: credit scores for Solana agents from on-chain creator fees, pay-later AI compute on UsePod, repay and lock $ANSEM from the agent wallet.",
   "type": "module",
