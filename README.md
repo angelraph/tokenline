@@ -2,6 +2,8 @@
 
 **Pay-later compute for AI agents.** Tokenline fronts UsePod inference to Solana agents today and gets repaid from their on-chain creator fees tomorrow.
 
+**Live:** https://tokenline.vercel.app · **X:** [@tokenlinehq](https://x.com/tokenlinehq)
+
 Built for the AnsemHack Clawrena. Tracks: ClawPump x pump.fun (builder), Inference Markets (UsePod), Overall.
 
 
