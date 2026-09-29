@@ -34,6 +34,13 @@ export const config = {
     overdueDays: 14,
   },
   xHandle: process.env.X_HANDLE || 'tokenlinehq',
+  /** X API user keys for @tokenlinehq (OAuth 1.0a, read and write). Only the Credit Watch bot uses them. */
+  xApi: {
+    consumerKey: process.env.X_API_KEY || '',
+    consumerSecret: process.env.X_API_SECRET || '',
+    token: process.env.X_ACCESS_TOKEN || '',
+    tokenSecret: process.env.X_ACCESS_SECRET || '',
+  },
   /** Price of one machine-readable credit report sold over x402. */
   reportPriceUsd: num(process.env.REPORT_PRICE_USD, 0.02),
   /** Signs x402 quotes so they can't be forged or replayed after expiry. */
