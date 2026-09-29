@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { TxLink, txOf } from '../TxLink';
 
 type Me = {
   agent: { id: string; name: string; wallet: string; mint: string | null; verified: boolean; frozen: boolean; keyPrefix: string };
@@ -23,7 +24,7 @@ export default function Account() {
   const [me, setMe] = useState<Me | null>(null);
   const [err, setErr] = useState('');
   const [prompt, setPrompt] = useState('In one sentence, why should AI agents have credit scores?');
-  const [reply, setReply] = useState<{ text: string; charged: string } | null>(null);
+  const [reply, setReply] = useState<{ text: string; charged: string; tx: string | null } | null>(null);
   const [thinking, setThinking] = useState(false);
 
   async function tryIt() {
@@ -35,8 +36,8 @@ export default function Account() {
         body: JSON.stringify({ model: 'deepseek-v4-1-flash', max_tokens: 400, messages: [{ role: 'user', content: prompt }] }),
       });
       const j = await r.json();
-      if (!r.ok) setReply({ text: j.error?.message ?? 'Request failed', charged: '0' });
-      else setReply({ text: j.choices?.[0]?.message?.content ?? '', charged: r.headers.get('x-tokenline-charged-usd') ?? '0' });
+      if (!r.ok) setReply({ text: j.error?.message ?? 'Request failed', charged: '0', tx: null });
+      else setReply({ text: j.choices?.[0]?.message?.content ?? '', charged: r.headers.get('x-tokenline-charged-usd') ?? '0', tx: r.headers.get('x-tokenline-payment-tx') });
       load(key);
     } finally { setThinking(false); }
   }
@@ -115,7 +116,7 @@ export default function Account() {
               {reply && (
                 <div className="callout" style={{ marginTop: 14 }}>
                   <div style={{ whiteSpace: 'pre-wrap' }}>{reply.text}</div>
-                  <div className="sub" style={{ marginTop: 8 }}>Charged ${Number(reply.charged).toFixed(6)} to this line.</div>
+                  <div className="sub" style={{ marginTop: 8 }}>Charged ${Number(reply.charged).toFixed(6)} to this line.{reply.tx && <> UsePod payment: <TxLink sig={reply.tx} /></>}</div>
                 </div>
               )}
             </div>
@@ -142,20 +143,21 @@ export default function Account() {
             <div className="section-head"><h2>Recent activity</h2><button className="btn" onClick={() => load(key)}>Refresh</button></div>
             <div className="table-wrap">
               <table>
-                <thead><tr><th>When</th><th>Type</th><th>Detail</th><th className="num">USD</th></tr></thead>
+                <thead><tr><th>When</th><th>Type</th><th className="hide-sm">Detail</th><th>Transaction</th><th className="num">USD</th></tr></thead>
                 <tbody>
                   {me.recent.map((e) => (
                     <tr key={e.id}>
                       <td className="sub">{new Date(e.at).toLocaleString()}</td>
                       <td>{e.type}</td>
-                      <td className="sub">
-                        {e.type === 'draw' ? `${e.meta?.model} · ${e.meta?.inputTokens}+${e.meta?.outputTokens} tok · ${e.meta?.route ?? 'usepod'}`
-                          : e.meta?.signature ? <a href={`https://solscan.io/tx/${e.meta.signature}`} target="_blank" rel="noreferrer">tx ↗</a> : ''}
+                      <td className="sub hide-sm">
+                        {e.type === 'draw' ? `${e.meta?.model} · ${e.meta?.inputTokens}+${e.meta?.outputTokens} tokens`
+                          : e.meta?.from ? `from ${String(e.meta.from).slice(0, 4)}…${String(e.meta.from).slice(-4)}` : ''}
                       </td>
+                      <td><TxLink sig={txOf(e)} /></td>
                       <td className="num">{e.amountUsd ? `$${e.amountUsd.toFixed(e.type === 'draw' ? 5 : 2)}` : 'n/a'}</td>
                     </tr>
                   ))}
-                  {!me.recent.length && <tr><td colSpan={4} className="sub">No activity yet.</td></tr>}
+                  {!me.recent.length && <tr><td colSpan={5} className="sub">No activity yet.</td></tr>}
                 </tbody>
               </table>
             </div>

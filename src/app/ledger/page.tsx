@@ -1,5 +1,6 @@
 import { poolStats } from '@/lib/board';
 import { store } from '@/lib/store';
+import { TxLink, txOf } from '../TxLink';
 
 export const dynamic = 'force-dynamic';
 
@@ -36,22 +37,23 @@ export default async function Ledger() {
 
       <div className="table-wrap">
         <table>
-          <thead><tr><th>When</th><th>Agent</th><th>Type</th><th>Detail</th><th className="num">USD</th></tr></thead>
+          <thead><tr><th>When</th><th>Agent</th><th>Type</th><th className="hide-sm">Detail</th><th>Transaction</th><th className="num">USD</th></tr></thead>
           <tbody>
             {events.map((e) => (
               <tr key={e.id}>
                 <td className="sub">{new Date(e.at).toLocaleString()}</td>
                 <td>{e.agentId ? names.get(e.agentId) ?? short(e.agentId) : <span className="sub">{e.meta?.from ? short(String(e.meta.from)) : 'n/a'}</span>}</td>
                 <td><span className="pill">{e.type}</span></td>
-                <td className="sub">
-                  {e.type === 'draw' ? <>{`${e.meta?.model} · ${Number(e.meta?.inputTokens) + Number(e.meta?.outputTokens)} tokens · ${e.meta?.route ?? 'usepod'}`}{e.meta?.x402Signature ? <> · <a href={`https://solscan.io/tx/${e.meta.x402Signature}`} target="_blank" rel="noreferrer">paid UsePod on-chain ↗</a></> : null}</>
-                    : e.meta?.signature ? <a href={`https://solscan.io/tx/${e.meta.signature}`} target="_blank" rel="noreferrer">{e.amount} {e.asset === 'SOL' ? 'SOL' : short(e.asset ?? '')} · tx ↗</a>
+                <td className="sub hide-sm">
+                  {e.type === 'draw' ? `${e.meta?.model} · ${Number(e.meta?.inputTokens) + Number(e.meta?.outputTokens)} tokens · ${e.meta?.x402Signature ? 'UsePod paid on-chain' : 'UsePod'}`
+                    : e.amount ? `${e.amount} ${e.asset === 'SOL' ? 'SOL' : short(e.asset ?? '')}${e.meta?.from ? ` from ${short(String(e.meta.from))}` : ''}`
                     : e.meta?.action ? String(e.meta.action) : ''}
                 </td>
+                <td><TxLink sig={txOf(e)} /></td>
                 <td className="num">{e.amountUsd ? `$${e.amountUsd.toFixed(e.type === 'draw' ? 5 : 2)}` : 'n/a'}</td>
               </tr>
             ))}
-            {!events.length && <tr><td colSpan={5} className="sub">The ledger is empty. The first line opens soon.</td></tr>}
+            {!events.length && <tr><td colSpan={6} className="sub">The ledger is empty. The first line opens soon.</td></tr>}
           </tbody>
         </table>
       </div>

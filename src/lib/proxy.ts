@@ -90,6 +90,7 @@ export async function proxy(req: Request, surface: Surface): Promise<Response> {
       'x-tokenline-charged-usd': charged.toFixed(6),
       'x-tokenline-available-usd': Math.max(0, pos.availableUsd - charged).toFixed(4),
       ...(route.route ? { 'x-pod-route': route.route } : {}),
+      ...(route.x402Signature ? { 'x-tokenline-payment-tx': route.x402Signature } : {}),
     });
   }
 

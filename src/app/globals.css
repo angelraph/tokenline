@@ -312,3 +312,7 @@ footer { border-top: 1px solid var(--line); margin-top: 96px; padding: 48px 0 56
 .faq details[open] .faq-a { animation: rise 0.45s var(--ease) both; }
 .faq-a { padding: 0 20px 20px; color: var(--muted); line-height: 1.7; font-size: 15px; opacity: 0; transform: translateY(6px); }
 .faq-a a { color: var(--accent); }
+
+/* transaction links */
+a.tx { color: var(--accent); font-size: 12px; white-space: nowrap; }
+a.tx:hover { text-decoration: underline; }
