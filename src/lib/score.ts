@@ -11,6 +11,10 @@ export type ScoreInput = {
   solPriceUsd: number;
   /** Share of supply held by the top 10 accounts, 0..1. Undefined = unknown. */
   top10Share?: number;
+  /** When the token's first trading pair was created (ms epoch). Undefined = unknown. */
+  launchedAt?: number;
+  /** Share of total supply the creator wallet has sold in its recent swaps, 0..1. Undefined = unknown. */
+  devSoldShare?: number;
   /** Tokenline's own history with this agent. */
   history?: { drawnUsd: number; repaidUsd: number; overdue: boolean };
   now?: number;
@@ -58,23 +62,33 @@ export function scoreAgent(i: ScoreInput, policy: Policy): ScoreResult {
   const add = (key: string, label: string, points: number, max: number, detail: string) =>
     components.push({ key, label, points: Math.round(points), max, detail });
 
-  add('revenue', 'Creator-fee revenue', 350 * logScale(monthlyCreatorUsd, 20_000), 350,
-    `$${r2(monthlyCreatorUsd).toLocaleString()} / month run-rate to the creator`);
+  // Seven signals, 1000 points in total. Unknown inputs score neutral (half marks), never a guess.
+  add('revenue', 'Creator-fee revenue', 300 * logScale(monthlyCreatorUsd, 20_000), 300,
+    `$${r2(monthlyCreatorUsd).toLocaleString('en-US')} / month run-rate to the creator`);
 
-  const recency = hoursSinceFee <= 24 ? 200 : hoursSinceFee <= 72 ? 150 : hoursSinceFee <= 168 ? 80 : 0;
-  add('recency', 'Fee recency', recency, 200,
+  const recency = hoursSinceFee <= 24 ? 175 : hoursSinceFee <= 72 ? 130 : hoursSinceFee <= 168 ? 70 : 0;
+  add('recency', 'Fee recency', recency, 175,
     Number.isFinite(hoursSinceFee) ? `last fee ${Math.round(hoursSinceFee)}h ago` : 'no fees collected yet');
 
   const perDay = daysLive ? i.collections / daysLive : 0;
-  add('consistency', 'Consistency', clamp(perDay / 2) * 120 + clamp(daysLive / 30) * 80, 200,
+  add('consistency', 'Consistency', clamp(perDay / 2) * 105 + clamp(daysLive / 30) * 70, 175,
     `${i.collections} fee collections over ${Math.round(daysLive)} days`);
 
-  add('momentum', 'Market momentum', 150 * logScale(i.volume24hUsd, 100_000), 150,
-    `$${Math.round(i.volume24hUsd).toLocaleString()} 24h volume`);
+  add('momentum', 'Market momentum', 125 * logScale(i.volume24hUsd, 100_000), 125,
+    `$${Math.round(i.volume24hUsd).toLocaleString('en-US')} 24h volume`);
 
   const dist = i.top10Share === undefined ? 50 : 100 * (1 - clamp((i.top10Share - 0.2) / 0.6));
   add('distribution', 'Holder distribution', dist, 100,
     i.top10Share === undefined ? 'not yet measured (neutral)' : `top 10 hold ${Math.round(i.top10Share * 100)}%`);
+
+  const ageDays = i.launchedAt === undefined ? undefined : Math.max(0, (now - i.launchedAt) / DAY);
+  add('age', 'Token age', ageDays === undefined ? 25 : 50 * clamp(ageDays / 30), 50,
+    ageDays === undefined ? 'launch date not yet known (neutral)' : `launched ${Math.round(ageDays)} days ago`);
+
+  add('dev', 'Creator behaviour', i.devSoldShare === undefined ? 38 : 75 * (1 - clamp(i.devSoldShare / 0.1)), 75,
+    i.devSoldShare === undefined ? 'creator activity not yet measured (neutral)'
+      : i.devSoldShare === 0 ? 'creator wallet has not sold in its recent swaps'
+      : `creator sold ${(i.devSoldShare * 100).toFixed(2)}% of supply in its recent swaps`);
 
   let score = components.reduce((s, c) => s + c.points, 0);
 

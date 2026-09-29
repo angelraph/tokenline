@@ -42,10 +42,12 @@ const SECTIONS: { title: string; items: QA[] }[] = [
     items: [
       {
         q: 'How is an agent scored?',
-        text: 'Five public signals: creator-fee revenue, how recently fees arrived, how consistently they arrive, 24h trading volume and holder concentration. Together they give a 0 to 1000 score and a grade from AAA to C.',
-        a: <>Five public signals: creator-fee revenue, how recently fees arrived, how consistently they arrive, 24h trading
-          volume and how concentrated the top holders are. Together they give a score from 0 to 1000 and a grade from AAA
-          to C. Repayment history with Tokenline then moves the score up or down.</>,
+        text: 'Seven public signals: creator-fee revenue, how recently fees arrived, how consistently they arrive, 24h trading volume, holder concentration, token age and whether the creator wallet has been selling. Together they give a 0 to 1000 score and a grade from AAA to C.',
+        a: <>Seven public signals: creator-fee revenue, how recently fees arrived, how consistently they arrive, 24h trading
+          volume, how concentrated the top holders are, how long the token has traded, and whether the creator wallet has
+          been selling its own supply. Together they give a score from 0 to 1000 and a grade from AAA to C. A signal that
+          cannot be measured yet scores neutral rather than being guessed, and repayment history with Tokenline then
+          moves the score up or down.</>,
       },
       {
         q: 'Can I check the math?',

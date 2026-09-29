@@ -18,7 +18,7 @@ What makes credit possible now: an agent's revenue is public. Every ClawPump tok
 | Module | What it does |
 |---|---|
 | **Credit Board** | Scores every tokenized Clawrena entry (188 at launch) from ClawPump's public fee feed. It shows a 0 to 1000 score, a grade from AAA to C, and a pre-approved line. |
-| **Underwriter** | A deterministic model anyone can recompute. Inputs: creator-fee run-rate, fee recency, collection consistency, 24h volume and top-10 holder concentration (Helius). Repayment history adjusts the score. |
+| **Underwriter** | A deterministic model anyone can recompute. Seven inputs (1000 points): creator-fee run-rate 300, fee recency 175, collection consistency 175, 24h volume 125, top-10 holder concentration 100 (Helius), token age 50 (DexScreener) and creator behaviour 75 (share of supply the creator wallet sold in its recent swaps, via RugCheck and Helius). Unmeasured inputs score neutral. Repayment history adjusts the score. |
 | **Compute Line** | An OpenAI-compatible `/v1/chat/completions` and Anthropic-compatible `/v1/messages` endpoint. Each call is routed to the best-priced UsePod provider, metered per token and booked to the agent's line at cost plus 15%. Calls stop hard at the limit. Streaming is supported. |
 | **On-chain repayment** | Agents send SOL or USDC from their registered wallet to the pool. A Helius webhook credits the payment in seconds, and every entry links to its transaction. Overpayments become prepaid compute. |
 | **$ANSEM collateral** | $ANSEM sent to escrow counts at 50% LTV. Any agent, with or without a Clawrena token, can open a secured line. |

@@ -43,6 +43,32 @@ test('concentrated holders score lower than distributed ones', () => {
   assert.ok(b > a);
 });
 
+test('weights add up to 1000 points', () => {
+  const r = scoreAgent(strong, policy);
+  assert.equal(r.components.reduce((s, c) => s + c.max, 0), 1000);
+});
+
+test('an older token scores higher on age than a brand new one', () => {
+  const age = (days: number) => scoreAgent({ ...strong, launchedAt: now - days * 86_400_000 }, policy).components.find((c) => c.key === 'age')!;
+  assert.equal(age(45).points, 50);
+  assert.equal(age(0).points, 0);
+  assert.ok(age(15).points > age(3).points);
+});
+
+test('creator selling 10% or more of supply zeroes creator behaviour', () => {
+  const dev = (share: number) => scoreAgent({ ...strong, devSoldShare: share }, policy).components.find((c) => c.key === 'dev')!;
+  assert.equal(dev(0).points, 75);
+  assert.equal(dev(0.1).points, 0);
+  assert.equal(dev(0.5).points, 0);
+  assert.ok(dev(0.02).points > dev(0.08).points);
+});
+
+test('unknown age and creator activity score neutral, not zero', () => {
+  const r = scoreAgent(strong, policy);
+  assert.equal(r.components.find((c) => c.key === 'age')!.points, 25);
+  assert.equal(r.components.find((c) => c.key === 'dev')!.points, 38);
+});
+
 test('grade boundaries', () => {
   assert.equal(gradeFor(800), 'AAA');
   assert.equal(gradeFor(299), 'C');

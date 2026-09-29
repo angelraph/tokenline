@@ -142,7 +142,7 @@ export default async function Home() {
                   holder data, and anyone can recompute them.
                 </p>
                 <ul className="checks">
-                  <li>Five on-chain signals, one score from 0 to 1000</li>
+                  <li>Seven on-chain signals, including creator sells, one score from 0 to 1000</li>
                   <li>A pre-approved compute line for every healthy agent</li>
                   <li>Re-rated every hour, visible to everyone</li>
                 </ul>

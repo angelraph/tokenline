@@ -6,6 +6,7 @@ import { tally } from './account';
 import { recordSnapshot } from './watch';
 import { spenderKeypair, upstreamMode } from './usepod';
 import { freshShare, holderCache, refreshHolders } from './holders';
+import { refreshDevSells, refreshLaunchDates, signalCaches, signalsFor } from './signals';
 import { waitUntil } from '@vercel/functions';
 
 export type BoardRow = {
@@ -28,14 +29,23 @@ export type BoardRow = {
 };
 
 export async function board(): Promise<{ rows: BoardRow[]; solPriceUsd: number; projects: number }> {
-  const [feed, agents, events, holders] = await Promise.all([getClawrena(), store.listAgents(), store.listEvents({ limit: 100_000 }), holderCache()]);
+  const [feed, agents, events, holders, signals] = await Promise.all([
+    getClawrena(), store.listAgents(), store.listEvents({ limit: 100_000 }), holderCache(), signalCaches(),
+  ]);
   const byMint = new Map(agents.filter((a) => a.mint).map((a) => [a.mint!, a]));
-  // Measure holder concentration for agents that lack a fresh value, after the response is sent.
-  waitUntil(refreshHolders(feed.projects.map((p) => p.mint)).catch(() => 0));
+  const mints = feed.projects.map((p) => p.mint);
+  // Fill missing measurements after the response is sent, so pages stay fast.
+  waitUntil((async () => {
+    await refreshHolders(mints).catch(() => 0);
+    await refreshLaunchDates(mints).catch(() => 0);
+    await refreshDevSells(mints, 10).catch(() => 0);
+  })());
   const rows = feed.projects.map((p) => {
     const agent = byMint.get(p.mint);
     const t = agent ? tally(events.filter((e) => e.agentId === agent.id)) : null;
-    const s = scoreAgent({ ...p, solPriceUsd: feed.solPriceUsd, top10Share: freshShare(holders, p.mint), history: t ?? undefined }, config.policy);
+    const s = scoreAgent({
+      ...p, ...signalsFor(signals, p.mint), solPriceUsd: feed.solPriceUsd, top10Share: freshShare(holders, p.mint), history: t ?? undefined,
+    }, config.policy);
     return {
       rank: 0, mint: p.mint, project: p.projectName, symbol: p.symbol, xHandle: p.xHandle,
       score: s.score, grade: s.grade, lineUsd: s.lineUsd, monthlyCreatorUsd: s.monthlyCreatorUsd,
@@ -46,9 +56,15 @@ export async function board(): Promise<{ rows: BoardRow[]; solPriceUsd: number; 
   });
   rows.sort((a, b) => b.score - a.score || b.monthlyCreatorUsd - a.monthlyCreatorUsd);
   rows.forEach((r, i) => (r.rank = i + 1));
-  // Only snapshot once holder data covers nearly every agent, so Watch never compares half-measured scores.
-  const measured = feed.projects.filter((p) => freshShare(holders, p.mint) !== undefined).length;
-  if (feed.projects.length && measured / feed.projects.length >= 0.9) await recordSnapshot(rows).catch(() => undefined);
+  // Only snapshot once every signal has been attempted for nearly every agent, so Watch never
+  // compares half-measured scores. Creator checks count once attempted, even when unmeasurable.
+  const n = feed.projects.length;
+  const covered = (f: (m: string) => boolean) => mints.filter(f).length / Math.max(1, n);
+  const ready = n > 0
+    && covered((m) => freshShare(holders, m) !== undefined) >= 0.9
+    && covered((m) => signals.launch[m] !== undefined) >= 0.9
+    && covered((m) => signals.dev[m] !== undefined) >= 0.9;
+  if (ready) await recordSnapshot(rows).catch(() => undefined);
   return { rows, solPriceUsd: feed.solPriceUsd, projects: feed.projects.length };
 }
 

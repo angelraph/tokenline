@@ -1,6 +1,7 @@
 import { syncOnchain } from '@/lib/sync';
 import { getClawrena } from '@/lib/clawrena';
 import { refreshHolders } from '@/lib/holders';
+import { refreshDevSells, refreshLaunchDates } from '@/lib/signals';
 import { ok, fail, isCron } from '@/lib/http';
 
 export const dynamic = 'force-dynamic';
@@ -15,8 +16,11 @@ async function run(req: Request) {
   try {
     const chain = await syncOnchain();
     const feed = await getClawrena();
-    const holdersMeasured = await refreshHolders(feed.projects.map((p) => p.mint), 250, 45_000);
-    return ok({ ...chain, holdersMeasured });
+    const mints = feed.projects.map((p) => p.mint);
+    const holdersMeasured = await refreshHolders(mints, 250, 20_000);
+    const launchDatesFound = await refreshLaunchDates(mints, 8_000);
+    const creatorsMeasured = await refreshDevSells(mints, 60, 20_000);
+    return ok({ ...chain, holdersMeasured, launchDatesFound, creatorsMeasured });
   } catch (e) {
     return fail(502, (e as Error).message);
   }
