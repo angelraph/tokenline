@@ -70,6 +70,10 @@ export async function tokenBalance(owner: string, mint: string): Promise<number>
 export type EnhancedTx = {
   signature: string;
   timestamp: number;
+  /** Wallet that paid the fee, i.e. who initiated the transaction. */
+  feePayer?: string;
+  /** Helius classification, for example SWAP or TRANSFER. */
+  type?: string;
   nativeTransfers?: { fromUserAccount: string; toUserAccount: string; amount: number }[];
   tokenTransfers?: { fromUserAccount: string; toUserAccount: string; tokenAmount: number; mint: string }[];
 };

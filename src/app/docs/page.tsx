@@ -114,7 +114,7 @@ GET /api/x402/report/:mint
           </div>
           <div className="card">
             <h3>Pricing</h3>
-            <p className="muted">UsePod cost + {config.policy.spreadBps / 100}% spread. No interest while you are current. Repay any time; overpayments become prepaid compute.</p>
+            <p className="muted">UsePod cost + {config.policy.spreadBps / 100}% spread ({config.policy.holderSpreadBps / 100}% for wallets holding ≥{config.policy.holderMin.toLocaleString()} $TOKENL). No interest while you are current. Repay any time; overpayments become prepaid compute. {config.policy.buybackShare * 100}% of revenue is committed to $TOKENL and $ANSEM buybacks, booked on the ledger.</p>
           </div>
           <div className="card">
             <h3>Delinquency</h3>
@@ -128,7 +128,7 @@ GET /api/x402/report/:mint
         <h2>Public API</h2>
         <pre className="code">{`GET  /api/board              every Clawrena entry, scored
 GET  /api/score/:mint        full credit report + memo
-GET  /api/pool               pool totals, spread revenue, default rate
+GET  /api/pool               pool totals, revenue, buybacks, default rate
 GET  /api/watch?hours=24     rating actions: upgrades, downgrades, pulled lines
 GET  /api/badge/:mint        SVG credit badge (current grade)
 GET  /api/x402/report/:mint  paid credit report with verdict (x402, SOL)

@@ -15,6 +15,10 @@ test('no previous measurement means no exit estimate yet', () => {
   assert.equal(whaleExit(undefined, { a: 10 }, 1, 1000), undefined);
 });
 
+test('no real wallets to follow means unknown, not "held"', () => {
+  assert.equal(whaleExit({}, { a: 10 }, 1, 1000), undefined);
+});
+
 test('a whale selling part of its bag is counted as a share of supply', () => {
   assert.equal(whaleExit({ a: 100, b: 50 }, { a: 60, b: 50 }, 5, 1000), 0.04);
 });

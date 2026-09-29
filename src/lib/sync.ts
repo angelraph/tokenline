@@ -1,56 +1,15 @@
 import { config } from './config';
 import { addressTransactions, type EnhancedTx } from './helius';
 import { assetUsd } from './prices';
-import { store, type Agent } from './store';
+import { store } from './store';
+import { classify } from './classify';
 
-const LAMPORTS = 1_000_000_000;
 const DUST_USD = 0.001;
 
-type Classified = {
-  type: 'repay' | 'collateral' | 'collateral_release' | 'deposit';
-  agentId: string | null;
-  asset: string;
-  amount: number;
-  from: string;
-  to: string;
-};
-
-/**
- * Turn one enhanced transaction into ledger entries for the pool and escrow wallets.
- * - SOL / USDC into the pool from an agent wallet -> repay (surplus becomes prepaid credit)
- * - SOL / USDC into the pool from anyone else     -> deposit (backer liquidity)
- * - $ANSEM / $TOKENL into escrow from an agent      -> collateral
- * - $ANSEM / $TOKENL out of escrow to an agent      -> collateral_release
- */
-export function classify(tx: EnhancedTx, byWallet: Map<string, Agent>): Classified[] {
-  const out: Classified[] = [];
-  const pool = config.poolWallet, escrow = config.escrowWallet;
-  const collateralMints = new Set([config.mints.ansem, config.mints.tline].filter(Boolean));
-
-  for (const t of tx.nativeTransfers ?? []) {
-    if (t.toUserAccount !== pool || t.fromUserAccount === pool || t.amount <= 0) continue;
-    const agent = byWallet.get(t.fromUserAccount);
-    out.push({ type: agent ? 'repay' : 'deposit', agentId: agent?.id ?? null, asset: 'SOL',
-      amount: t.amount / LAMPORTS, from: t.fromUserAccount, to: pool });
-  }
-  for (const t of tx.tokenTransfers ?? []) {
-    if (!t.tokenAmount || t.tokenAmount <= 0) continue;
-    if (t.mint === config.mints.usdc && t.toUserAccount === pool && t.fromUserAccount !== pool) {
-      const agent = byWallet.get(t.fromUserAccount);
-      out.push({ type: agent ? 'repay' : 'deposit', agentId: agent?.id ?? null, asset: t.mint,
-        amount: t.tokenAmount, from: t.fromUserAccount, to: pool });
-    } else if (collateralMints.has(t.mint)) {
-      const inAgent = byWallet.get(t.fromUserAccount);
-      const outAgent = byWallet.get(t.toUserAccount);
-      if (t.toUserAccount === escrow && inAgent) {
-        out.push({ type: 'collateral', agentId: inAgent.id, asset: t.mint, amount: t.tokenAmount, from: t.fromUserAccount, to: escrow });
-      } else if (t.fromUserAccount === escrow && outAgent) {
-        out.push({ type: 'collateral_release', agentId: outAgent.id, asset: t.mint, amount: t.tokenAmount, from: escrow, to: t.toUserAccount });
-      }
-    }
-  }
-  return out;
-}
+const wallets = () => ({
+  pool: config.poolWallet, escrow: config.escrowWallet, usdc: config.mints.usdc,
+  collateralMints: [config.mints.ansem, config.mints.tline],
+});
 
 export async function ingest(txs: EnhancedTx[]) {
   const agents = await store.listAgents();
@@ -59,7 +18,7 @@ export async function ingest(txs: EnhancedTx[]) {
   for (const tx of txs) {
     // Report purchases are booked as sales at checkout; don't count them twice.
     if ((await store.eventsForSignature(tx.signature)).some((e) => e.type === 'sale')) continue;
-    for (const c of classify(tx, byWallet)) {
+    for (const c of classify(tx, byWallet, wallets())) {
       const px = await assetUsd(c.asset);
       const usd = c.amount * px;
       if (usd < DUST_USD && c.type !== 'collateral' && c.type !== 'collateral_release') continue;

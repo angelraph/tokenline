@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { board, poolStats } from '@/lib/board';
 import { scoreForMint } from '@/lib/account';
+import { config } from '@/lib/config';
 import { store } from '@/lib/store';
 import { CountUp } from './CountUp';
 import { LiveFeed, type FeedEvent } from './LiveFeed';
@@ -196,7 +197,7 @@ export default async function Home() {
             <div className="step"><div className="n">1</div><h3>Get rated</h3><p>Sign one message with your agent wallet. Your score and line come straight from your token&apos;s fees.</p></div>
             <div className="step"><div className="n">2</div><h3>Think on credit</h3><p>Point any OpenAI or Anthropic SDK at Tokenline. Every call runs on UsePod and is capped at your limit.</p></div>
             <div className="step"><div className="n">3</div><h3>Repay on-chain</h3><p>Send SOL or USDC when fees arrive. It is credited in seconds and your score goes up.</p></div>
-            <div className="step"><div className="n">4</div><h3>Go bigger</h3><p>Lock $ANSEM as collateral or hold $TOKENL and your line grows with it.</p></div>
+            <div className="step"><div className="n">4</div><h3>Go bigger</h3><p>Lock $ANSEM as collateral to raise your line. Hold $TOKENL for a bigger line and a lower spread.</p></div>
           </div>
         </section>
 
@@ -214,6 +215,28 @@ export default async function Home() {
                 <p>{x.body}</p>
               </Link>
             ))}
+          </div>
+        </section>
+
+        <section className="lsection reveal">
+          <div className="lhead">
+            <div>
+              <div className="eyebrow">The $TOKENL flywheel</div>
+              <h2 style={{ marginTop: 8 }}>The desk earns. Half goes back to the market.</h2>
+              <p className="muted" style={{ maxWidth: 620 }}>
+                Every call on credit carries a small spread and every paid report is revenue. {Math.round(pool.buybackShare * 100)}% of it
+                is committed to buying $TOKENL and $ANSEM, and each buyback lands on the public ledger with its transaction. Agents
+                holding {config.policy.holderMin.toLocaleString('en-US')}+ $TOKENL get a {Math.round(config.policy.holderBoost * 100)}% bigger line
+                and pay a {config.policy.holderSpreadBps / 100}% spread instead of {config.policy.spreadBps / 100}%.
+              </p>
+            </div>
+            <Link href="/ledger" className="btn sm">See the buybacks <span className="arrow">→</span></Link>
+          </div>
+          <div className="bigstats">
+            <div className="bigstat"><div className="k">Desk revenue</div><div className="v"><CountUp value={pool.revenueUsd} prefix="$" decimals={pool.revenueUsd < 1 ? 4 : 2} /></div><div className="note">spread plus paid reports</div></div>
+            <div className="bigstat"><div className="k">Committed to buybacks</div><div className="v"><CountUp value={pool.buybackTargetUsd} prefix="$" decimals={pool.buybackTargetUsd < 1 ? 4 : 2} /></div><div className="note">{Math.round(pool.buybackShare * 100)}% of revenue</div></div>
+            <div className="bigstat signal"><div className="k">Bought back</div><div className="v"><CountUp value={pool.buybackUsd} prefix="$" decimals={pool.buybackUsd < 1 ? 4 : 2} /></div><div className="note">{pool.buybackCount ? `${pool.buybackCount} on-chain ${pool.buybackCount === 1 ? 'swap' : 'swaps'}` : 'first swap pending'}</div></div>
+            <div className="bigstat"><div className="k">Holder spread</div><div className="v">{config.policy.holderSpreadBps / 100}%</div><div className="note">vs {config.policy.spreadBps / 100}% standard</div></div>
           </div>
         </section>
 

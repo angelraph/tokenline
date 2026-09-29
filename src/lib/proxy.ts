@@ -65,13 +65,16 @@ export async function proxy(req: Request, surface: Surface): Promise<Response> {
     x402Lamports: payment?.lamports ?? null,
   };
 
+  // $TOKENL holders pay a lower markup on every draw.
+  const spreadBps = pos.holderBoost ? config.policy.holderSpreadBps : config.policy.spreadBps;
+
   const book = async (inTok: number, outTok: number, model: string) => {
     const upstreamUsd = upstreamCostUsd(model, inTok, outTok);
-    const charged = withSpread(upstreamUsd, config.policy.spreadBps);
+    const charged = withSpread(upstreamUsd, spreadBps);
     if (charged <= 0) return 0;
     await store.addEvent({
       agentId: agent.id, type: 'draw', amountUsd: charged, asset: null, amount: null, txSig: null,
-      meta: { model, surface, inputTokens: inTok, outputTokens: outTok, upstreamUsd, ...route },
+      meta: { model, surface, inputTokens: inTok, outputTokens: outTok, upstreamUsd, spreadBps, ...route },
     });
     return charged;
   };

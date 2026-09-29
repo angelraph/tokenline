@@ -82,9 +82,10 @@ const SECTIONS: { title: string; items: QA[] }[] = [
     items: [
       {
         q: 'What does it cost?',
-        text: `UsePod's price for each call plus a ${p.spreadBps / 100}% spread. There is no interest while your balance is current.`,
-        a: <>UsePod&apos;s price for each call plus a {p.spreadBps / 100}% spread. There is no interest while your balance
-          is current, and no fee to open a line.</>,
+        text: `UsePod's price for each call plus a ${p.spreadBps / 100}% spread, or ${p.holderSpreadBps / 100}% if your agent wallet holds at least ${p.holderMin.toLocaleString()} $TOKENL. There is no interest while your balance is current.`,
+        a: <>UsePod&apos;s price for each call plus a {p.spreadBps / 100}% spread, or {p.holderSpreadBps / 100}% if your agent
+          wallet holds at least {p.holderMin.toLocaleString()} $TOKENL. There is no interest while your balance is current,
+          and no fee to open a line.</>,
       },
       {
         q: 'How do I repay?',
@@ -112,9 +113,18 @@ const SECTIONS: { title: string; items: QA[] }[] = [
       },
       {
         q: 'What does $TOKENL do?',
-        text: `Wallets holding at least ${p.holderMin.toLocaleString()} $TOKENL get ${pct(p.holderBoost)} more unsecured credit, $TOKENL counts as collateral, and its trading fees go into the lending pool.`,
+        text: `Wallets holding at least ${p.holderMin.toLocaleString()} $TOKENL get ${pct(p.holderBoost)} more unsecured credit and a ${p.holderSpreadBps / 100}% spread instead of ${p.spreadBps / 100}%. $TOKENL counts as collateral, and its trading fees go into the lending pool.`,
         a: <>Wallets holding at least {p.holderMin.toLocaleString()} $TOKENL get {pct(p.holderBoost)} more unsecured
-          credit. $TOKENL also counts as collateral, and its trading fees feed the lending pool.</>,
+          credit and pay a {p.holderSpreadBps / 100}% spread instead of {p.spreadBps / 100}%. $TOKENL also counts as collateral,
+          and its trading fees feed the lending pool.</>,
+      },
+      {
+        q: 'Does Tokenline buy back $TOKENL?',
+        text: `Yes. ${pct(p.buybackShare)} of desk revenue (draw spread plus paid reports) is committed to market buys of $TOKENL and $ANSEM. The operator signs each swap from the pool wallet; the chain sync detects it and books it on the public ledger with its transaction, next to the running total still owed to the commitment.`,
+        a: <>Yes. {pct(p.buybackShare)} of desk revenue (draw spread plus paid reports) is committed to market buys of
+          $TOKENL and $ANSEM. The operator signs each swap from the pool wallet; the chain sync detects it and books it on
+          the <Link href="/ledger">public ledger</Link> with its transaction, next to the running total still owed to the
+          commitment.</>,
       },
     ],
   },

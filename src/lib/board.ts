@@ -71,6 +71,9 @@ export async function board(): Promise<{ rows: BoardRow[]; solPriceUsd: number; 
 export async function poolStats() {
   const [agents, events] = await Promise.all([store.listAgents(), store.listEvents({ limit: 100_000 })]);
   let drawnUsd = 0, upstreamUsd = 0, repaidUsd = 0, depositsUsd = 0, draws = 0, tokensServed = 0, salesUsd = 0, reportsSold = 0;
+  let buybackUsd = 0;
+  const bought: Record<string, number> = {};
+  const buybacks: { signature: string; asset: string; amount: number; usd: number; at: string }[] = [];
   for (const e of events) {
     if (e.type === 'draw') {
       drawnUsd += e.amountUsd; draws++;
@@ -80,6 +83,11 @@ export async function poolStats() {
     if (e.type === 'repay') repaidUsd += e.amountUsd;
     if (e.type === 'deposit') depositsUsd += e.amountUsd;
     if (e.type === 'sale') { salesUsd += e.amountUsd; reportsSold++; }
+    if (e.type === 'buyback' && e.asset) {
+      buybackUsd += e.amountUsd;
+      bought[e.asset] = (bought[e.asset] ?? 0) + Number(e.amount ?? 0);
+      buybacks.push({ signature: String(e.meta?.signature ?? ''), asset: e.asset, amount: Number(e.amount ?? 0), usd: e.amountUsd, at: e.at });
+    }
   }
   let overdueUsd = 0, outstandingUsd = 0;
   for (const a of agents) {
@@ -100,6 +108,14 @@ export async function poolStats() {
     spreadRevenueUsd: r2(drawnUsd - upstreamUsd),
     reportsSold,
     reportRevenueUsd: r2(salesUsd),
+    // Flywheel: a share of what the desk earns (spread + report sales) buys back $TOKENL / $ANSEM.
+    revenueUsd: r2(drawnUsd - upstreamUsd + salesUsd),
+    buybackShare: config.policy.buybackShare,
+    buybackTargetUsd: r2((drawnUsd - upstreamUsd + salesUsd) * config.policy.buybackShare),
+    buybackUsd: r2(buybackUsd),
+    buybackCount: new Set(buybacks.map((b) => b.signature)).size,
+    bought,
+    buybacks: buybacks.sort((a, b) => b.at.localeCompare(a.at)).slice(0, 20),
     overdueUsd: r2(overdueUsd),
     defaultRate: drawnUsd ? r2((overdueUsd / drawnUsd) * 100) : 0,
     lastSyncAt: await store.getKv<string>('lastSyncAt'),

@@ -20,10 +20,14 @@ export const config = {
   },
   policy: {
     spreadBps: num(process.env.SPREAD_BPS, 1500),
+    /** Spread for agents whose wallet holds at least holderMin $TOKENL. */
+    holderSpreadBps: num(process.env.TLINE_HOLDER_SPREAD_BPS, 1000),
     baseLineCapUsd: num(process.env.BASE_LINE_CAP_USD, 25),
     collateralLtv: num(process.env.COLLATERAL_LTV, 0.5),
     holderBoost: num(process.env.TLINE_HOLDER_BOOST, 0.25),
     holderMin: num(process.env.TLINE_HOLDER_MIN, 100_000),
+    /** Share of desk revenue (spread + report sales) committed to buying back $TOKENL / $ANSEM. */
+    buybackShare: num(process.env.BUYBACK_SHARE, 0.5),
     // Days of silence (no fee collections) before an unsecured line is frozen.
     staleDays: 7,
     // Outstanding debt older than this with no repayment marks the agent overdue.

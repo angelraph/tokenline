@@ -18,25 +18,27 @@ What makes credit possible now: an agent's revenue is public. Every ClawPump tok
 | Module | What it does |
 |---|---|
 | **Credit Board** | Scores every tokenized Clawrena entry (188 at launch) from ClawPump's public fee feed. It shows a 0 to 1000 score, a grade from AAA to C, and a pre-approved line. |
-| **Underwriter** | A deterministic model anyone can recompute. Seven inputs (1000 points): creator-fee run-rate 300, fee recency 175, collection consistency 175, 24h volume 125, top-10 holder concentration 100 (Helius), token age 50 (DexScreener) and creator behaviour 75 (share of supply the creator wallet sold in its recent swaps, via RugCheck and Helius). Unmeasured inputs score neutral. Repayment history adjusts the score. |
+| **Underwriter** | A deterministic model anyone can recompute. Seven inputs (1000 points): creator-fee run-rate 300, fee recency 175, collection consistency 175, 24h volume 125, top-10 holder concentration 100 (Helius), token age 50 (DexScreener) and creator and whale behaviour 75 (the worse of: share of supply the creator wallet sold in its recent swaps, via RugCheck and Helius; and share of supply the largest real wallets sold since the previous holder snapshot, via Helius). Unmeasured inputs score neutral. Repayment history adjusts the score. |
 | **Compute Line** | An OpenAI-compatible `/v1/chat/completions` and Anthropic-compatible `/v1/messages` endpoint. Each call is routed to the best-priced UsePod provider, metered per token and booked to the agent's line at cost plus 15%. Calls stop hard at the limit. Streaming is supported. |
 | **On-chain repayment** | Agents send SOL or USDC from their registered wallet to the pool. A Helius webhook credits the payment in seconds, and every entry links to its transaction. Overpayments become prepaid compute. |
 | **$ANSEM collateral** | $ANSEM sent to escrow counts at 50% LTV. Any agent, with or without a Clawrena token, can open a secured line. |
-| **$TOKENL utility** | Holders of 100k+ $TOKENL get 25% more unsecured line. $TOKENL is also accepted as collateral. |
+| **$TOKENL utility** | Holders of 100k+ $TOKENL get 25% more unsecured line and a 10% spread instead of 15%. $TOKENL is also accepted as collateral. |
+| **Buyback flywheel** | 50% of desk revenue (draw spread plus paid reports) is committed to market buys of $TOKENL and $ANSEM. The operator signs each swap from the pool wallet; the chain sync recognises pool-signed swaps and books them as buybacks on the ledger, next to the commitment still open. |
 | **Credit Watch** | Re-rates all Clawrena agents every hour. Flags upgrades, downgrades, newly approved lines and lines pulled because fees went quiet. |
 | **Credit Reports over x402** | Any agent buys a machine-readable report with an `extend`, `caution` or `avoid` verdict for $0.02 in SOL, using the same x402 wire format as UsePod. Payment goes straight to the lending pool and is verified on-chain. |
 | **Credit Badge** | An SVG of any agent's current grade, regenerated every few minutes, for READMEs, sites and banners. |
 | **Spend analytics** | Each agent sees where its compute goes: calls, tokens and spend by model. |
 | **Credit memos on UsePod** | Each credit report includes an analyst memo written by an LLM bought through UsePod. |
 | **MCP server + skill** | `tl_check_credit`, `tl_think`, `tl_repay_quote`, `tl_score`, `tl_board` and `tl_watch` as MCP tools, plus a ClawPump skill file. Any Hermes or ClawPump agent can draw, repay and vet counterparties. |
-| **Public ledger** | Every draw, repayment, collateral move and pool deposit, with pool revenue and default rate. |
+| **Public ledger** | Every draw, repayment, collateral move, pool deposit and buyback, with pool revenue and default rate. |
 | **Operator console** | Verifies X handles, freezes lines and triggers chain syncs. Every action is written to the ledger. |
 
 ## Credit policy
 
 - **Unsecured line** = `min($25, 10% of monthly creator revenue) x score / 1000`. It unlocks once the project's X account posts its verification code.
 - **Secured line** = 50% of collateral value.
-- **Price** = UsePod cost + 15% spread. No interest while the agent is current.
+- **Price** = UsePod cost + 15% spread, or 10% when the agent wallet holds 100k+ $TOKENL. No interest while the agent is current.
+- **Buybacks** = 50% of revenue (spread plus report sales), executed by the operator from the pool wallet and tracked on the ledger.
 - **Delinquency**: a balance with no repayment for 14 days freezes the line and costs 300 points on the public board. Tokens with no fees for 7 days lose the unsecured line.
 - **Custody**: the escrow wallet is a published, operator-held address. Limits are deliberately small. A trustless on-chain program is on the roadmap.
 
@@ -118,7 +120,7 @@ Or run it locally from `mcp/` (`npm install && npm run build`, then `node mcp/di
 |---|---|---|---|
 | GET | `/api/board` | none | every Clawrena entry, scored |
 | GET | `/api/score/:mint` | none | credit report and memo |
-| GET | `/api/pool` | none | pool totals, spread revenue, default rate |
+| GET | `/api/pool` | none | pool totals, revenue, buybacks, default rate |
 | GET | `/api/ledger` | none | public ledger |
 | GET | `/api/watch?hours=24` | none | rating actions |
 | GET | `/api/badge/:mint` | none | SVG credit badge (current grade) |
