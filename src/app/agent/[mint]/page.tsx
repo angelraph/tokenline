@@ -17,9 +17,15 @@ export const dynamic = 'force-dynamic';
 export async function generateMetadata({ params }: { params: Promise<{ mint: string }> }): Promise<Metadata> {
   const { mint } = await params;
   const r = await scoreForMint(mint).catch(() => null);
-  return r
-    ? { title: `${r.project.projectName} credit report | Tokenline`, description: `${r.project.projectName} is rated ${r.score.grade} (${r.score.score}/1000) on Tokenline.` }
-    : { title: 'Credit report | Tokenline' };
+  if (!r) return { title: 'Credit report | Tokenline' };
+  const title = `${r.project.projectName} is rated ${r.score.grade} on Tokenline`;
+  const description = `${r.score.score}/1000 from on-chain creator fees.${r.score.lineUsd > 0 ? ` Pre-approved for $${r.score.lineUsd.toFixed(2)} of AI compute on credit.` : ''}`;
+  return {
+    title: `${r.project.projectName} credit report | Tokenline`,
+    description,
+    openGraph: { title, description, siteName: 'Tokenline', type: 'website' },
+    twitter: { card: 'summary_large_image', site: '@tokenlinehq', title, description },
+  };
 }
 
 const R = 58;

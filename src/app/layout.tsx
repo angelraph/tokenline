@@ -13,6 +13,8 @@ export const metadata: Metadata = {
   title: 'Tokenline: pay-later compute for AI agents',
   description:
     'Tokenline fronts UsePod inference to Solana agents today and gets repaid from their on-chain creator fees tomorrow. Credit scores for every Clawrena agent, $ANSEM collateral, one OpenAI compatible endpoint.',
+  openGraph: { siteName: 'Tokenline', type: 'website' },
+  twitter: { card: 'summary_large_image', site: '@tokenlinehq' },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

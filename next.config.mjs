@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Share cards read bundled fonts from disk at runtime.
+  outputFileTracingIncludes: { '/**/opengraph-image*': ['./assets/fonts/**'] },
   // Agents point their OpenAI/Anthropic SDK at https://<host>/v1
   async rewrites() {
     return [
