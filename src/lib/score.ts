@@ -15,6 +15,8 @@ export type ScoreInput = {
   launchedAt?: number;
   /** Share of total supply the creator wallet has sold in its recent swaps, 0..1. Undefined = unknown. */
   devSoldShare?: number;
+  /** Share of total supply the largest real wallets sold since the previous measurement, 0..1. Undefined = unknown. */
+  whaleExitShare?: number;
   /** Tokenline's own history with this agent. */
   history?: { drawnUsd: number; repaidUsd: number; overdue: boolean };
   now?: number;
@@ -85,10 +87,15 @@ export function scoreAgent(i: ScoreInput, policy: Policy): ScoreResult {
   add('age', 'Token age', ageDays === undefined ? 25 : 50 * clamp(ageDays / 30), 50,
     ageDays === undefined ? 'trading start not yet known (neutral)' : `trading for ${Math.round(ageDays)} days`);
 
-  add('dev', 'Creator behaviour', i.devSoldShare === undefined ? 38 : 75 * (1 - clamp(i.devSoldShare / 0.1)), 75,
-    i.devSoldShare === undefined ? 'creator activity not yet measured (neutral)'
-      : i.devSoldShare === 0 ? 'creator wallet has not sold in its recent swaps'
-      : `creator sold ${(i.devSoldShare * 100).toFixed(2)}% of supply in its recent swaps`);
+  // Creator and whale behaviour: the worse of creator sells and big-wallet exits, 10% of supply or more scores zero.
+  const pct = (x: number) => `${(x * 100).toFixed(2)}%`;
+  const known = [i.devSoldShare, i.whaleExitShare].filter((x): x is number => x !== undefined);
+  const worst = known.length ? Math.max(...known) : undefined;
+  const parts: string[] = [];
+  if (i.devSoldShare !== undefined) parts.push(i.devSoldShare === 0 ? 'creator has not sold' : `creator sold ${pct(i.devSoldShare)} of supply`);
+  if (i.whaleExitShare !== undefined) parts.push(i.whaleExitShare === 0 ? 'top wallets held' : `top wallets sold ${pct(i.whaleExitShare)} of supply`);
+  add('dev', 'Creator and whale behaviour', worst === undefined ? 38 : 75 * (1 - clamp(worst / 0.1)), 75,
+    worst === undefined ? 'creator and whale activity not yet measured (neutral)' : parts.join('; '));
 
   let score = components.reduce((s, c) => s + c.points, 0);
 

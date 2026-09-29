@@ -1,3 +1,4 @@
+import { PublicKey } from '@solana/web3.js';
 import { config } from './config';
 
 const rpcUrl = () =>
@@ -15,23 +16,40 @@ async function rpc<T>(method: string, params: unknown[]): Promise<T> {
   return j.result as T;
 }
 
-const top10Cache = new Map<string, { v: number; at: number }>();
 
-/** Share of supply held by the 10 largest token accounts (0..1). */
-export async function top10Share(mint: string): Promise<number | undefined> {
-  const hit = top10Cache.get(mint);
-  if (hit && Date.now() - hit.at < 30 * 60_000) return hit.v;
+export type HolderSnapshot = {
+  /** Share of supply in the 10 largest token accounts, pools included (0..1). */
+  top10: number;
+  supply: number;
+  /** Real wallets (on-curve owners) among the 20 largest accounts: owner -> balance. Pools and curves are excluded. */
+  whales: Record<string, number>;
+  /** Smallest balance in the largest-accounts list; any wallet outside the list holds at most this. */
+  floor: number;
+};
+
+/** Largest holders with their owning wallets, in three RPC calls. */
+export async function holderSnapshot(mint: string): Promise<HolderSnapshot | undefined> {
   try {
     const [largest, supply] = await Promise.all([
-      rpc<{ value: { uiAmount: number }[] }>('getTokenLargestAccounts', [mint]),
+      rpc<{ value: { address: string; uiAmount: number }[] }>('getTokenLargestAccounts', [mint]),
       rpc<{ value: { uiAmount: number } }>('getTokenSupply', [mint]),
     ]);
     const total = supply.value.uiAmount;
-    if (!total) return undefined;
-    const top = largest.value.slice(0, 10).reduce((s, a) => s + (a.uiAmount ?? 0), 0);
-    const v = Math.min(1, top / total);
-    top10Cache.set(mint, { v, at: Date.now() });
-    return v;
+    if (!total || !largest.value.length) return undefined;
+    const accounts = largest.value.slice(0, 20);
+    const infos = await rpc<{ value: ({ data: { parsed?: { info?: { owner?: string } } } } | null)[] }>(
+      'getMultipleAccounts', [accounts.map((a) => a.address), { encoding: 'jsonParsed' }]);
+    const whales: Record<string, number> = {};
+    accounts.forEach((a, i) => {
+      const owner = infos.value[i]?.data?.parsed?.info?.owner;
+      if (owner && PublicKey.isOnCurve(new PublicKey(owner).toBytes())) whales[owner] = (whales[owner] ?? 0) + (a.uiAmount ?? 0);
+    });
+    return {
+      top10: Math.min(1, accounts.slice(0, 10).reduce((s, a) => s + (a.uiAmount ?? 0), 0) / total),
+      supply: total,
+      whales,
+      floor: accounts[accounts.length - 1]?.uiAmount ?? 0,
+    };
   } catch {
     return undefined;
   }

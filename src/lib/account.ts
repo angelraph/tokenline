@@ -1,7 +1,7 @@
 import { config } from './config';
 import { findProject } from './clawrena';
 import { tokenBalance } from './helius';
-import { holderShare } from './holders';
+import { freshExit, holderCache, holderShare } from './holders';
 import { refreshDevSells, refreshLaunchDates, signalCaches, signalsFor } from './signals';
 import { waitUntil } from '@vercel/functions';
 import { assetUsd } from './prices';
@@ -53,6 +53,7 @@ export async function scoreForMint(mint: string, history?: { drawnUsd: number; r
   const { feed, project } = await findProject(mint);
   if (!project) return null;
   const [top10, signals] = await Promise.all([holderShare(mint), signalCaches()]);
+  const exit = freshExit(await holderCache(), mint);
   // Read the same cached signals as the board; fill any gaps for this mint in the background.
   waitUntil((async () => {
     await refreshLaunchDates([mint], 5_000).catch(() => 0);
@@ -60,7 +61,7 @@ export async function scoreForMint(mint: string, history?: { drawnUsd: number; r
   })());
   return {
     project,
-    score: scoreAgent({ ...project, ...signalsFor(signals, mint, project.firstFeeAt), solPriceUsd: feed.solPriceUsd, top10Share: top10, history }, config.policy),
+    score: scoreAgent({ ...project, ...signalsFor(signals, mint, project.firstFeeAt), solPriceUsd: feed.solPriceUsd, top10Share: top10, whaleExitShare: exit, history }, config.policy),
   };
 }
 

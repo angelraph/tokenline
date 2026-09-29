@@ -5,7 +5,7 @@ import { store } from './store';
 import { tally } from './account';
 import { recordSnapshot } from './watch';
 import { spenderKeypair, upstreamMode } from './usepod';
-import { freshShare, holderCache, refreshHolders } from './holders';
+import { freshExit, freshShare, holderCache, refreshHolders } from './holders';
 import { refreshDevSells, refreshLaunchDates, signalCaches, signalsFor } from './signals';
 import { waitUntil } from '@vercel/functions';
 
@@ -44,7 +44,7 @@ export async function board(): Promise<{ rows: BoardRow[]; solPriceUsd: number; 
     const agent = byMint.get(p.mint);
     const t = agent ? tally(events.filter((e) => e.agentId === agent.id)) : null;
     const s = scoreAgent({
-      ...p, ...signalsFor(signals, p.mint, p.firstFeeAt), solPriceUsd: feed.solPriceUsd, top10Share: freshShare(holders, p.mint), history: t ?? undefined,
+      ...p, ...signalsFor(signals, p.mint, p.firstFeeAt), solPriceUsd: feed.solPriceUsd, top10Share: freshShare(holders, p.mint), whaleExitShare: freshExit(holders, p.mint), history: t ?? undefined,
     }, config.policy);
     return {
       rank: 0, mint: p.mint, project: p.projectName, symbol: p.symbol, xHandle: p.xHandle,
