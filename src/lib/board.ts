@@ -65,7 +65,7 @@ export async function poolStats() {
     outstandingUsd += t.outstandingUsd;
     if (t.overdue) overdueUsd += t.outstandingUsd;
   }
-  const r2 = (x: number) => Math.round(x * 100) / 100;
+  const r2 = (x: number) => Math.round(x * 1e6) / 1e6;
   return {
     agents: agents.length,
     verifiedAgents: agents.filter((a) => a.verified).length,

@@ -32,7 +32,7 @@ export default function Account() {
       const r = await fetch('/v1/chat/completions', {
         method: 'POST',
         headers: { authorization: `Bearer ${key}`, 'content-type': 'application/json' },
-        body: JSON.stringify({ model: 'deepseek-v4-1-flash', max_tokens: 200, messages: [{ role: 'user', content: prompt }] }),
+        body: JSON.stringify({ model: 'deepseek-v4-1-flash', max_tokens: 400, messages: [{ role: 'user', content: prompt }] }),
       });
       const j = await r.json();
       if (!r.ok) setReply({ text: j.error?.message ?? 'Request failed', charged: '0' });
@@ -76,10 +76,10 @@ export default function Account() {
       {me && p && (
         <>
           <div className="stats">
-            <div className="stat"><div className="k">Available</div><div className="v" style={{ color: 'var(--accent)' }}>${p.availableUsd.toFixed(2)}</div></div>
+            <div className="stat"><div className="k">Available</div><div className="v" style={{ color: 'var(--accent)' }}>${p.availableUsd.toFixed(p.availableUsd < 1 ? 4 : 2)}</div></div>
             <div className="stat"><div className="k">Limit</div><div className="v">${p.limitUsd.toFixed(2)}</div></div>
             <div className="stat"><div className="k">Outstanding</div><div className="v">${p.outstandingUsd.toFixed(4)}</div></div>
-            <div className="stat"><div className="k">Prepaid</div><div className="v">${p.prepaidUsd.toFixed(2)}</div></div>
+            <div className="stat"><div className="k">Prepaid</div><div className="v">${p.prepaidUsd.toFixed(p.prepaidUsd < 1 ? 4 : 2)}</div></div>
             <div className="stat"><div className="k">Status</div><div className="v" style={{ fontSize: 16 }}>{p.status.replace('_', ' ')}</div></div>
           </div>
 
@@ -110,7 +110,7 @@ export default function Account() {
                 <button className="btn primary" disabled={thinking || !prompt.trim() || p.availableUsd <= 0} onClick={tryIt}>
                   {thinking ? 'Thinking…' : 'Run on credit'}
                 </button>
-                <span className="sub">{p.availableUsd > 0 ? `${p.availableUsd.toFixed(2)} USD available` : 'No credit available yet'}</span>
+                <span className="sub">{p.availableUsd > 0 ? `${p.availableUsd.toFixed(4)} available` : 'No credit available yet'}</span>
               </div>
               {reply && (
                 <div className="callout" style={{ marginTop: 14 }}>

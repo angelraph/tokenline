@@ -3,6 +3,7 @@ import { store } from '@/lib/store';
 
 export const dynamic = 'force-dynamic';
 
+const usd = (x: number) => `${x.toFixed(x > 0 && x < 1 ? 4 : 2)}`;
 const short = (s: string) => `${s.slice(0, 4)}…${s.slice(-4)}`;
 
 export default async function Ledger() {
@@ -18,9 +19,9 @@ export default async function Ledger() {
       </section>
 
       <div className="stats">
-        <div className="stat"><div className="k">Outstanding</div><div className="v">${pool.outstandingUsd}</div></div>
-        <div className="stat"><div className="k">Spread revenue</div><div className="v">${pool.spreadRevenueUsd}</div></div>
-        <div className="stat"><div className="k">Backer deposits</div><div className="v">${pool.depositsUsd}</div></div>
+        <div className="stat"><div className="k">Outstanding</div><div className="v">{usd(pool.outstandingUsd)}</div></div>
+        <div className="stat"><div className="k">Spread revenue</div><div className="v">{usd(pool.spreadRevenueUsd)}</div></div>
+        <div className="stat"><div className="k">Backer deposits</div><div className="v">{usd(pool.depositsUsd)}</div></div>
         <div className="stat"><div className="k">Default rate</div><div className="v">{pool.defaultRate}%</div></div>
         <div className="stat"><div className="k">Draws</div><div className="v">{pool.draws}</div></div>
         <div className="stat"><div className="k">Last chain sync</div><div className="v" style={{ fontSize: 14 }}>{pool.lastSyncAt ? new Date(pool.lastSyncAt).toLocaleString() : 'n/a'}</div></div>

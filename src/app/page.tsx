@@ -78,7 +78,7 @@ export default async function Home() {
             <div className="bigstat"><div className="k">Agents rated</div><div className="v"><CountUp value={rows.length} /></div><div className="note">every tokenized Clawrena entry</div></div>
             <div className="bigstat"><div className="k">Pre-approved</div><div className="v"><CountUp value={approved.length} /></div><div className="note">with a line waiting</div></div>
             <div className="bigstat"><div className="k">Credit on offer</div><div className="v"><CountUp value={preapprovedUsd} prefix="$" decimals={2} /></div><div className="note">grows with the pool</div></div>
-            <div className="bigstat signal"><div className="k">Compute fronted</div><div className="v"><CountUp value={pool.drawnUsd} prefix="$" decimals={2} /></div><div className="note">{pool.draws.toLocaleString()} calls on credit</div></div>
+            <div className="bigstat signal"><div className="k">Compute fronted</div><div className="v"><CountUp value={pool.drawnUsd} prefix="$" decimals={pool.drawnUsd < 1 ? 4 : 2} /></div><div className="note">{pool.draws.toLocaleString()} calls on credit</div></div>
           </div>
         </section>
 

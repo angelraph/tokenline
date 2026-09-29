@@ -25,6 +25,7 @@ export type Position = {
 
 const DAY = 86_400_000;
 const r2 = (x: number) => Math.round(x * 100) / 100;
+const r6 = (x: number) => Math.round(x * 1e6) / 1e6;
 
 export function tally(events: LedgerEvent[]) {
   let drawnUsd = 0, repaidUsd = 0;
@@ -78,7 +79,7 @@ export async function position(agent: Agent): Promise<Position> {
   const unsecuredLineUsd = r2(unsecured * (holderBoost ? 1 + config.policy.holderBoost : 1));
   const securedLineUsd = r2(collateralUsd * config.policy.collateralLtv);
   const limitUsd = r2(unsecuredLineUsd + securedLineUsd);
-  const availableUsd = agent.frozen || t.overdue ? 0 : r2(Math.max(0, limitUsd + t.prepaidUsd - t.outstandingUsd));
+  const availableUsd = agent.frozen || t.overdue ? 0 : r6(Math.max(0, limitUsd + t.prepaidUsd - t.outstandingUsd));
 
   const status: Position['status'] = agent.frozen ? 'frozen'
     : t.overdue ? 'overdue'
@@ -87,7 +88,7 @@ export async function position(agent: Agent): Promise<Position> {
     : 'no_line';
 
   return {
-    drawnUsd: r2(t.drawnUsd), repaidUsd: r2(t.repaidUsd), outstandingUsd: r2(t.outstandingUsd), prepaidUsd: r2(t.prepaidUsd),
+    drawnUsd: r6(t.drawnUsd), repaidUsd: r6(t.repaidUsd), outstandingUsd: r6(t.outstandingUsd), prepaidUsd: r6(t.prepaidUsd),
     collateral, collateralUsd, unsecuredLineUsd, securedLineUsd, holderBoost,
     limitUsd, availableUsd, overdue: t.overdue, status, score,
   };
