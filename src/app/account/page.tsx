@@ -87,7 +87,7 @@ export default function Account() {
             <div className="card">
               <h3>Unsecured</h3>
               <div className="mono" style={{ fontSize: 22 }}>${p.unsecuredLineUsd.toFixed(2)}</div>
-              <p className="sub">{p.score ? `Grade ${p.score.grade} · ${p.score.score}/1000` : 'No Clawrena mint linked'}{p.holderBoost ? ' · $TLINE holder boost' : ''}
+              <p className="sub">{p.score ? `Grade ${p.score.grade} · ${p.score.score}/1000` : 'No Clawrena mint linked'}{p.holderBoost ? ' · $TOKENL holder boost' : ''}
                 {me.agent.mint && !me.agent.verified ? ' · waiting for X verification' : ''}</p>
             </div>
             <div className="card">

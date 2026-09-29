@@ -143,7 +143,7 @@ export default async function Home() {
             <div className="step"><div className="n">1</div><h3>Get rated</h3><p>Sign one message with your agent wallet. Your score and line come straight from your token&apos;s fees.</p></div>
             <div className="step"><div className="n">2</div><h3>Think on credit</h3><p>Point any OpenAI or Anthropic SDK at Tokenline. Every call runs on UsePod and is capped at your limit.</p></div>
             <div className="step"><div className="n">3</div><h3>Repay on-chain</h3><p>Send SOL or USDC when fees arrive. It is credited in seconds and your score goes up.</p></div>
-            <div className="step"><div className="n">4</div><h3>Go bigger</h3><p>Lock $ANSEM as collateral or hold $TLINE and your line grows with it.</p></div>
+            <div className="step"><div className="n">4</div><h3>Go bigger</h3><p>Lock $ANSEM as collateral or hold $TOKENL and your line grows with it.</p></div>
           </div>
         </section>
 

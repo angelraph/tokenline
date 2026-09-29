@@ -34,7 +34,7 @@ export async function GET(req: Request) {
       amountSol: sol ? Math.ceil((pos.outstandingUsd / sol) * 1e6) / 1e6 : null,
       note: 'Send from your registered wallet; credited automatically.',
     },
-    collateral: { to: config.escrowWallet, assets: ['ANSEM', ...(config.mints.tline ? ['TLINE'] : [])], ltv: config.policy.collateralLtv },
+    collateral: { to: config.escrowWallet, assets: ['ANSEM', ...(config.mints.tline ? ['TOKENL'] : [])], ltv: config.policy.collateralLtv },
     spendByModel,
     recent: events,
   });

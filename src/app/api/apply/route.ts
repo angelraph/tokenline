@@ -16,7 +16,7 @@ const Body = z.object({
 });
 
 const verifyCodeFn = (agentId: string) =>
-  'TLINE-' + createHash('sha256').update(agentId).digest('hex').slice(0, 6).toUpperCase();
+  'TL-' + createHash('sha256').update(agentId).digest('hex').slice(0, 6).toUpperCase();
 
 /**
  * Open a Tokenline account. The wallet signs a fresh message, which proves control

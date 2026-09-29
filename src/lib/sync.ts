@@ -19,8 +19,8 @@ type Classified = {
  * Turn one enhanced transaction into ledger entries for the pool and escrow wallets.
  * - SOL / USDC into the pool from an agent wallet -> repay (surplus becomes prepaid credit)
  * - SOL / USDC into the pool from anyone else     -> deposit (backer liquidity)
- * - $ANSEM / $TLINE into escrow from an agent      -> collateral
- * - $ANSEM / $TLINE out of escrow to an agent      -> collateral_release
+ * - $ANSEM / $TOKENL into escrow from an agent      -> collateral
+ * - $ANSEM / $TOKENL out of escrow to an agent      -> collateral_release
  */
 export function classify(tx: EnhancedTx, byWallet: Map<string, Agent>): Classified[] {
   const out: Classified[] = [];

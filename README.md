@@ -1,8 +1,8 @@
-# Tokenline ($TLINE)
+# Tokenline ($TOKENL)
 
 **Pay-later compute for AI agents.** Tokenline fronts UsePod inference to Solana agents today and gets repaid from their on-chain creator fees tomorrow.
 
-**Live:** https://tokenline.vercel.app · **X:** [@tokenlinehq](https://x.com/tokenlinehq)
+**Live:** https://tokenline.vercel.app · **X:** [@tokenlinehq](https://x.com/tokenlinehq) · **Token:** [$TOKENL](https://clawpump.tech/tokens/4sfvc4dHviSKG33KnT6ZvecXtUpvqtE4Nb4Stkj2S9Ya) `4sfvc4dHviSKG33KnT6ZvecXtUpvqtE4Nb4Stkj2S9Ya`
 
 Built for the AnsemHack Clawrena. Tracks: ClawPump x pump.fun (builder), Inference Markets (UsePod), Overall.
 
@@ -22,7 +22,7 @@ What makes credit possible now: an agent's revenue is public. Every ClawPump tok
 | **Compute Line** | An OpenAI-compatible `/v1/chat/completions` and Anthropic-compatible `/v1/messages` endpoint. Each call is routed to the best-priced UsePod provider, metered per token and booked to the agent's line at cost plus 15%. Calls stop hard at the limit. Streaming is supported. |
 | **On-chain repayment** | Agents send SOL or USDC from their registered wallet to the pool. A Helius webhook credits the payment in seconds, and every entry links to its transaction. Overpayments become prepaid compute. |
 | **$ANSEM collateral** | $ANSEM sent to escrow counts at 50% LTV. Any agent, with or without a Clawrena token, can open a secured line. |
-| **$TLINE utility** | Holders of 100k+ $TLINE get 25% more unsecured line. $TLINE is also accepted as collateral. |
+| **$TOKENL utility** | Holders of 100k+ $TOKENL get 25% more unsecured line. $TOKENL is also accepted as collateral. |
 | **Credit Watch** | Re-rates all Clawrena agents every hour. Flags upgrades, downgrades, newly approved lines and lines pulled because fees went quiet. |
 | **Credit Reports over x402** | Any agent buys a machine-readable report with an `extend`, `caution` or `avoid` verdict for $0.02 in SOL, using the same x402 wire format as UsePod. Payment goes straight to the lending pool and is verified on-chain. |
 | **Credit Badge** | A live SVG of any agent's grade, for READMEs, sites and banners. |
@@ -82,7 +82,7 @@ The pool wallet is receive-only. Its private key is never needed by Tokenline.
 
 1. Import the repo into Vercel and set the variables from `.env.example`, including `DATABASE_URL` for Postgres.
 2. In Helius, create an **enhanced** webhook on `POOL_WALLET` and `ESCROW_WALLET`. Point it at `https://<host>/api/webhooks/helius` and set its auth header to `CRON_SECRET`.
-3. Put a few cents of SOL in the spender wallet. Launch $TLINE with its payout wallet set to `POOL_WALLET`, so the token's own creator fees refill the pool.
+3. Put a few cents of SOL in the spender wallet. Launch $TOKENL with its payout wallet set to `POOL_WALLET`, so the token's own creator fees refill the pool.
 
 ### Agent integration
 

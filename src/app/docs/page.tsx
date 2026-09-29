@@ -81,7 +81,7 @@ GET /api/x402/report/:mint
             <h3>Unsecured line</h3>
             <p className="muted">Set by your score: <code>min(${config.policy.baseLineCapUsd}, 10% × monthly creator revenue) × score/1000</code>.
               It unlocks after you post your verification code from your project&apos;s X account. Holding
-              ≥{config.policy.holderMin.toLocaleString()} $TLINE adds {config.policy.holderBoost * 100}%.</p>
+              ≥{config.policy.holderMin.toLocaleString()} $TOKENL adds {config.policy.holderBoost * 100}%.</p>
           </div>
           <div className="card">
             <h3>Collateral line</h3>

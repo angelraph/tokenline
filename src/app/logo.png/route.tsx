@@ -2,7 +2,7 @@ import { ImageResponse } from 'next/og';
 
 export const runtime = 'edge';
 
-/** 512px $TLINE logo, used for the token image and avatars. */
+/** 512px $TOKENL logo, used for the token image and avatars. */
 export function GET() {
   return new ImageResponse(
     (

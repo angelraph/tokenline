@@ -8,7 +8,7 @@ const TOKEN = 'tokenline.admin';
 
 async function sha6(id: string) {
   const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(id));
-  return 'TLINE-' + [...new Uint8Array(d)].map((b) => b.toString(16).padStart(2, '0')).join('').slice(0, 6).toUpperCase();
+  return 'TL-' + [...new Uint8Array(d)].map((b) => b.toString(16).padStart(2, '0')).join('').slice(0, 6).toUpperCase();
 }
 
 export default function Admin() {

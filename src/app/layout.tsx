@@ -64,6 +64,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <Link href="/ledger">Public ledger</Link>
                 <Link href="/faq">FAQ</Link>
                 <a href="https://x.com/tokenlinehq" target="_blank" rel="noreferrer">@tokenlinehq</a>
+                <a href="https://clawpump.tech/tokens/4sfvc4dHviSKG33KnT6ZvecXtUpvqtE4Nb4Stkj2S9Ya" target="_blank" rel="noreferrer">$TOKENL on ClawPump</a>
               </div>
             </div>
             <div className="foot-note">

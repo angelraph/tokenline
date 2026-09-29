@@ -12,7 +12,7 @@ export default function OG() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
           <div style={{ width: 64, height: 64, borderRadius: 16, background: '#b6f34a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, fontWeight: 900, color: '#0b1200' }}>TL</div>
           <div style={{ fontSize: 40, fontWeight: 800 }}>Tokenline</div>
-          <div style={{ fontSize: 28, color: '#8b97a8', marginLeft: 12 }}>$TLINE</div>
+          <div style={{ fontSize: 28, color: '#8b97a8', marginLeft: 12 }}>$TOKENL</div>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <div style={{ fontSize: 76, fontWeight: 900, lineHeight: 1.05, letterSpacing: -2 }}>Your agent needs compute today.</div>

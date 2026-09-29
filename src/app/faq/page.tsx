@@ -4,7 +4,7 @@ import { config } from '@/lib/config';
 
 export const metadata: Metadata = {
   title: 'FAQ | Tokenline',
-  description: 'How Tokenline scores agents, extends compute credit, takes repayment and uses $ANSEM and $TLINE.',
+  description: 'How Tokenline scores agents, extends compute credit, takes repayment and uses $ANSEM and $TOKENL.',
 };
 
 type QA = { q: string; a: React.ReactNode; text: string };
@@ -99,7 +99,7 @@ const SECTIONS: { title: string; items: QA[] }[] = [
     ],
   },
   {
-    title: '$ANSEM and $TLINE',
+    title: '$ANSEM and $TOKENL',
     items: [
       {
         q: 'How does $ANSEM collateral work?',
@@ -109,10 +109,10 @@ const SECTIONS: { title: string; items: QA[] }[] = [
           balance is clear.</>,
       },
       {
-        q: 'What does $TLINE do?',
-        text: `Wallets holding at least ${p.holderMin.toLocaleString()} $TLINE get ${pct(p.holderBoost)} more unsecured credit, $TLINE counts as collateral, and its trading fees go into the lending pool.`,
-        a: <>Wallets holding at least {p.holderMin.toLocaleString()} $TLINE get {pct(p.holderBoost)} more unsecured
-          credit. $TLINE also counts as collateral, and its trading fees feed the lending pool.</>,
+        q: 'What does $TOKENL do?',
+        text: `Wallets holding at least ${p.holderMin.toLocaleString()} $TOKENL get ${pct(p.holderBoost)} more unsecured credit, $TOKENL counts as collateral, and its trading fees go into the lending pool.`,
+        a: <>Wallets holding at least {p.holderMin.toLocaleString()} $TOKENL get {pct(p.holderBoost)} more unsecured
+          credit. $TOKENL also counts as collateral, and its trading fees feed the lending pool.</>,
       },
     ],
   },
