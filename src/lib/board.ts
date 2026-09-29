@@ -4,6 +4,7 @@ import { scoreAgent, type Grade } from './score';
 import { store } from './store';
 import { tally } from './account';
 import { recordSnapshot } from './watch';
+import { spenderKeypair, upstreamMode } from './usepod';
 
 export type BoardRow = {
   rank: number;
@@ -82,5 +83,13 @@ export async function poolStats() {
     lastSyncAt: await store.getKv<string>('lastSyncAt'),
     poolWallet: config.poolWallet || null,
     escrowWallet: config.escrowWallet || null,
+    upstream: upstreamMode(),
+    spenderWallet: spenderAddress(),
   };
+}
+
+/** Public address of the hot wallet that pays UsePod per call (x402 mode). */
+function spenderAddress(): string | null {
+  if (upstreamMode() !== 'x402') return null;
+  try { return spenderKeypair().publicKey.toBase58(); } catch { return null; }
 }
