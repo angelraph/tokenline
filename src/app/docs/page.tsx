@@ -67,7 +67,7 @@ const agent = new SolanaAgentKit(wallet, rpcUrl, {})
 
 // ElizaOS v1
 export const character = { name: 'MyAgent', plugins: [tokenlinePlugin],
-  settings: { secrets: { TOKENLINE_KEY: 'tl_...' } } };`}</pre>
+  secrets: { TOKENLINE_KEY: 'tl_...' } };`}</pre>
         <p className="sub">Repay and collateral are built by Tokenline&apos;s Solana Actions endpoints and signed by the agent&apos;s own wallet. The key never leaves the agent.</p>
       </div>
 

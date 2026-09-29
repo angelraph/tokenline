@@ -10,7 +10,7 @@ import { tokenlinePlugin } from '@tokenline/plugin-elizaos';
 export const character = {
   name: 'MyAgent',
   plugins: [tokenlinePlugin],
-  settings: { secrets: { TOKENLINE_KEY: 'tl_...' } }, // optional, only for the credit line
+  secrets: { TOKENLINE_KEY: 'tl_...' }, // optional, only for the credit line
 };
 ```
 
