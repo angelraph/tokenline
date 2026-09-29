@@ -47,9 +47,9 @@ What makes credit possible now: an agent's revenue is public. Every ClawPump tok
 | Where | How |
 |---|---|
 | **ClawPump agents** | Custom skill in `skill/tokenline/`, submitted to the ClawPump Community Skills registry |
-| **Any MCP client** | Remote MCP server at `https://tokenline.vercel.app/mcp` (6 tools, nothing to install) |
-| **Solana Agent Kit v2** | `plugins/solana-agent-kit`: 7 actions, including repay and lock $ANSEM signed by the agent wallet |
-| **ElizaOS v1** | `plugins/elizaos`: score, board, watch and credit actions |
+| **Any MCP client** | Remote MCP server at `https://tokenline.vercel.app/mcp` (6 tools, nothing to install), or locally with `npx -y tokenline-mcp` |
+| **Solana Agent Kit v2** | [`npm i tokenline-plugin-solana-agent-kit`](https://www.npmjs.com/package/tokenline-plugin-solana-agent-kit): 7 actions, including repay and lock $ANSEM signed by the agent wallet |
+| **ElizaOS v1** | [`npm i tokenline-plugin-elizaos`](https://www.npmjs.com/package/tokenline-plugin-elizaos): score, board, watch and credit actions |
 | **Solana Blinks** | `/actions.json` plus repay, lock $ANSEM and buy-report actions |
 
 ## Architecture
@@ -112,7 +112,12 @@ MCP (remote, nothing to install):
   "headers": { "Authorization": "Bearer tl_..." } } } }
 ```
 
-Or run it locally from `mcp/` (`npm install && npm run build`, then `node mcp/dist/index.js` with `TOKENLINE_URL` and `TOKENLINE_KEY`).
+Or run it locally with [`tokenline-mcp`](https://www.npmjs.com/package/tokenline-mcp):
+
+```json
+{ "mcpServers": { "tokenline": { "command": "npx", "args": ["-y", "tokenline-mcp"],
+  "env": { "TOKENLINE_KEY": "tl_..." } } } }
+```
 
 ## Public API
 

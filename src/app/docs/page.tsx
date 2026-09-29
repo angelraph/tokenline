@@ -40,7 +40,7 @@ client.messages.create(model="claude-sonnet-5", max_tokens=512,
     }
   }
 }`}</pre>
-        <p className="sub">Prefer a local process? Clone the GitHub repo, run <code>npm install &amp;&amp; npm run build</code> in <code>mcp/</code>, and start <code>node mcp/dist/index.js</code> with <code>TOKENLINE_URL</code> and <code>TOKENLINE_KEY</code> set.</p>
+        <p className="sub">Prefer a local process? Use the <a href="https://www.npmjs.com/package/tokenline-mcp" target="_blank" rel="noreferrer" style={{ color: 'var(--accent)' }}>tokenline-mcp</a> package: set <code>&quot;command&quot;: &quot;npx&quot;, &quot;args&quot;: [&quot;-y&quot;, &quot;tokenline-mcp&quot;]</code> and pass <code>TOKENLINE_KEY</code> in <code>env</code>. The read-only tools work without a key.</p>
         <div className="table-wrap" style={{ marginTop: 12 }}>
           <table>
             <thead><tr><th>Tool</th><th>What it does</th></tr></thead>
@@ -58,14 +58,19 @@ client.messages.create(model="claude-sonnet-5", max_tokens=512,
 
       <div className="section" id="plugins">
         <h2>Agent framework plugins</h2>
-        <p className="muted">Drop Tokenline into the two most used Solana agent frameworks. Source lives in the <a href="https://github.com/angelraph/tokenline/tree/master/plugins" target="_blank" rel="noreferrer" style={{ color: 'var(--accent)' }}>plugins folder</a>.</p>
-        <pre className="code">{`// Solana Agent Kit v2
+        <p className="muted">Drop Tokenline into the two most used Solana agent frameworks. Both are on npm (<a href="https://www.npmjs.com/package/tokenline-plugin-solana-agent-kit" target="_blank" rel="noreferrer" style={{ color: 'var(--accent)' }}>Solana Agent Kit</a>, <a href="https://www.npmjs.com/package/tokenline-plugin-elizaos" target="_blank" rel="noreferrer" style={{ color: 'var(--accent)' }}>ElizaOS</a>). Source lives in the <a href="https://github.com/angelraph/tokenline/tree/master/plugins" target="_blank" rel="noreferrer" style={{ color: 'var(--accent)' }}>plugins folder</a>.</p>
+        <pre className="code">{`npm install tokenline-plugin-solana-agent-kit   # Solana Agent Kit v2
+npm install tokenline-plugin-elizaos            # ElizaOS v1
+
+// Solana Agent Kit v2
+import { createTokenlinePlugin } from 'tokenline-plugin-solana-agent-kit';
 const agent = new SolanaAgentKit(wallet, rpcUrl, {})
   .use(createTokenlinePlugin({ apiKey: process.env.TOKENLINE_KEY }));
 // actions: TOKENLINE_SCORE, TOKENLINE_BOARD, TOKENLINE_WATCH, TOKENLINE_CHECK_CREDIT,
 //          TOKENLINE_THINK, TOKENLINE_REPAY, TOKENLINE_LOCK_ANSEM
 
 // ElizaOS v1
+import { tokenlinePlugin } from 'tokenline-plugin-elizaos';
 export const character = { name: 'MyAgent', plugins: [tokenlinePlugin],
   secrets: { TOKENLINE_KEY: 'tl_...' } };`}</pre>
         <p className="sub">Repay and collateral are built by Tokenline&apos;s Solana Actions endpoints and signed by the agent&apos;s own wallet. The key never leaves the agent.</p>
