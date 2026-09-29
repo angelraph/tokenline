@@ -60,7 +60,7 @@ export async function scoreForMint(mint: string, history?: { drawnUsd: number; r
   })());
   return {
     project,
-    score: scoreAgent({ ...project, ...signalsFor(signals, mint), solPriceUsd: feed.solPriceUsd, top10Share: top10, history }, config.policy),
+    score: scoreAgent({ ...project, ...signalsFor(signals, mint, project.firstFeeAt), solPriceUsd: feed.solPriceUsd, top10Share: top10, history }, config.policy),
   };
 }
 

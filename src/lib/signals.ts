@@ -20,10 +20,16 @@ export async function signalCaches() {
   return { launch: launch ?? {}, dev: dev ?? {} };
 }
 
-export function signalsFor(c: Awaited<ReturnType<typeof signalCaches>>, mint: string) {
+/**
+ * Signals for one mint. Age uses the earliest DexScreener pair, falling back to the first
+ * creator-fee collection in ClawPump's feed (fees begin with the first trade) for small tokens
+ * DexScreener does not list.
+ */
+export function signalsFor(c: Awaited<ReturnType<typeof signalCaches>>, mint: string, firstFeeAt?: string | null) {
   const d = c.dev[mint];
+  const firstFee = firstFeeAt ? Date.parse(firstFeeAt) : NaN;
   return {
-    launchedAt: c.launch[mint],
+    launchedAt: c.launch[mint] ?? (Number.isFinite(firstFee) ? firstFee : undefined),
     devSoldShare: d && d.share !== null && Date.now() - d.at < DEV_FRESH_MS ? d.share : undefined,
   };
 }

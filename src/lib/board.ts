@@ -44,7 +44,7 @@ export async function board(): Promise<{ rows: BoardRow[]; solPriceUsd: number; 
     const agent = byMint.get(p.mint);
     const t = agent ? tally(events.filter((e) => e.agentId === agent.id)) : null;
     const s = scoreAgent({
-      ...p, ...signalsFor(signals, p.mint), solPriceUsd: feed.solPriceUsd, top10Share: freshShare(holders, p.mint), history: t ?? undefined,
+      ...p, ...signalsFor(signals, p.mint, p.firstFeeAt), solPriceUsd: feed.solPriceUsd, top10Share: freshShare(holders, p.mint), history: t ?? undefined,
     }, config.policy);
     return {
       rank: 0, mint: p.mint, project: p.projectName, symbol: p.symbol, xHandle: p.xHandle,
@@ -62,7 +62,7 @@ export async function board(): Promise<{ rows: BoardRow[]; solPriceUsd: number; 
   const covered = (f: (m: string) => boolean) => mints.filter(f).length / Math.max(1, n);
   const ready = n > 0
     && covered((m) => freshShare(holders, m) !== undefined) >= 0.9
-    && covered((m) => signals.launch[m] !== undefined) >= 0.9
+    && feed.projects.filter((p) => signalsFor(signals, p.mint, p.firstFeeAt).launchedAt !== undefined).length / n >= 0.9
     && covered((m) => signals.dev[m] !== undefined) >= 0.9;
   if (ready) await recordSnapshot(rows).catch(() => undefined);
   return { rows, solPriceUsd: feed.solPriceUsd, projects: feed.projects.length };

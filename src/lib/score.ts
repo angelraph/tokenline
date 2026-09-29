@@ -83,7 +83,7 @@ export function scoreAgent(i: ScoreInput, policy: Policy): ScoreResult {
 
   const ageDays = i.launchedAt === undefined ? undefined : Math.max(0, (now - i.launchedAt) / DAY);
   add('age', 'Token age', ageDays === undefined ? 25 : 50 * clamp(ageDays / 30), 50,
-    ageDays === undefined ? 'launch date not yet known (neutral)' : `launched ${Math.round(ageDays)} days ago`);
+    ageDays === undefined ? 'trading start not yet known (neutral)' : `trading for ${Math.round(ageDays)} days`);
 
   add('dev', 'Creator behaviour', i.devSoldShare === undefined ? 38 : 75 * (1 - clamp(i.devSoldShare / 0.1)), 75,
     i.devSoldShare === undefined ? 'creator activity not yet measured (neutral)'
