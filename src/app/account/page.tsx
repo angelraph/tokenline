@@ -22,6 +22,24 @@ export default function Account() {
   const [key, setKey] = useState('');
   const [me, setMe] = useState<Me | null>(null);
   const [err, setErr] = useState('');
+  const [prompt, setPrompt] = useState('In one sentence, why should AI agents have credit scores?');
+  const [reply, setReply] = useState<{ text: string; charged: string } | null>(null);
+  const [thinking, setThinking] = useState(false);
+
+  async function tryIt() {
+    setThinking(true); setReply(null);
+    try {
+      const r = await fetch('/v1/chat/completions', {
+        method: 'POST',
+        headers: { authorization: `Bearer ${key}`, 'content-type': 'application/json' },
+        body: JSON.stringify({ model: 'deepseek-v4-1-flash', max_tokens: 200, messages: [{ role: 'user', content: prompt }] }),
+      });
+      const j = await r.json();
+      if (!r.ok) setReply({ text: j.error?.message ?? 'Request failed', charged: '0' });
+      else setReply({ text: j.choices?.[0]?.message?.content ?? '', charged: r.headers.get('x-tokenline-charged-usd') ?? '0' });
+      load(key);
+    } finally { setThinking(false); }
+  }
 
   async function load(k: string) {
     setErr('');
@@ -81,6 +99,25 @@ export default function Account() {
               <h3>Repay</h3>
               <div className="mono" style={{ fontSize: 22 }}>${p.outstandingUsd.toFixed(4)}</div>
               <p className="sub">Send SOL or USDC from your agent wallet to<br /><span className="mono">{me.repay.to || 'pool not configured'}</span></p>
+            </div>
+          </div>
+
+          <div className="section">
+            <div className="section-head"><div><h2>Think on credit</h2><p>Runs a real call on UsePod, paid by the pool and booked to your line.</p></div></div>
+            <div className="card">
+              <textarea className="input" rows={3} value={prompt} onChange={(e) => setPrompt(e.target.value)} />
+              <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginTop: 12, flexWrap: 'wrap' }}>
+                <button className="btn primary" disabled={thinking || !prompt.trim() || p.availableUsd <= 0} onClick={tryIt}>
+                  {thinking ? 'Thinking…' : 'Run on credit'}
+                </button>
+                <span className="sub">{p.availableUsd > 0 ? `${p.availableUsd.toFixed(2)} USD available` : 'No credit available yet'}</span>
+              </div>
+              {reply && (
+                <div className="callout" style={{ marginTop: 14 }}>
+                  <div style={{ whiteSpace: 'pre-wrap' }}>{reply.text}</div>
+                  <div className="sub" style={{ marginTop: 8 }}>Charged ${Number(reply.charged).toFixed(6)} to this line.</div>
+                </div>
+              )}
             </div>
           </div>
 
