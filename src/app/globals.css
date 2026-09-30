@@ -492,7 +492,7 @@ footer { border-top: 1px solid var(--line); margin-top: 72px; padding: 40px 0 32
   .cell-name { min-width: 0; }
   .grade { min-width: 38px; padding: 3px 6px; }
   td.when span { display: block; }
-  .tx-tail { display: none; }
+  .tx-tail, .tx-arrow { display: none; }
   td .pill { padding: 3px 7px; font-size: 11px; gap: 0; }
   td .pill .dot { display: none; }
   .name-trunc { display: inline-block; max-width: 27vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
@@ -519,6 +519,8 @@ footer { border-top: 1px solid var(--line); margin-top: 72px; padding: 40px 0 32
   .nav-links a { padding: 12px 0; margin: -12px 0; }
   .btn.sm { min-height: 34px; }
 }
+
+@media (max-width: 380px) { td, th { padding: 10px 5px; } }
 
 /* faq */
 .faq-group { margin: 28px 0; }
