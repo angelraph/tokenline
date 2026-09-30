@@ -41,14 +41,22 @@ test('header counts every move; replies tag only upgrades and new lines, best fi
     move({ xHandle: 'fell', delta: -60, to: 500, kind: 'downgrade' }),
     move({ xHandle: 'fresh', delta: 40, to: 640, gradeTo: 'A', lineFrom: 0, lineTo: 0.32, kind: 'newly_approved' }),
   ], since, now, base);
-  assert.match(posts[0], /last 24h/);
-  assert.match(posts[0], /▲ 2 upgrades\n▼ 1 downgrade\n✓ 1 new credit line/);
-  assert.match(posts[0], /Top mover: @big AAA 880 \(\+80\)/);
+  assert.match(posts[0], /Two agents moved up, one got its first credit line and one slipped\./);
+  assert.match(posts[0], /Biggest jump: @big, now AAA at 880, up 80 points\./);
   assert.equal(posts.length, 4);
-  assert.ok(posts.slice(1).every((p) => !p.includes('@fell')));
-  assert.match(posts[1], /@big moves to AAA, 880\/1000 \(\+80\)\. Pre-approved for \$0\.30/);
-  assert.match(posts[2], /New credit line: @fresh rates A, 640\/1000\. Pre-approved for \$0\.32/);
+  assert.ok(posts.every((p) => !p.includes('@fell')));
+  assert.match(posts[1], /@big.*880/);
+  assert.match(posts[2], /@fresh.*\$0\.32/);
+  assert.match(posts[3], /@small.*730/);
   assert.ok(posts[1].endsWith(`${base}/agent/${'M'.repeat(44)}`));
+});
+
+test('reads like a person: no symbols, and wording changes from day to day', () => {
+  const moves = [move({ xHandle: 'big', delta: 80, to: 880, gradeTo: 'AAA' })];
+  const days = [0, 1, 2, 3].map((d) => composeDigest(moves, since + d * 86_400_000, now + d * 86_400_000, base));
+  for (const posts of days) for (const p of posts) assert.doesNotMatch(p, /[25b225bc271320142013]/);
+  assert.ok(new Set(days.map((p) => p[0].split('\n')[0])).size > 1);
+  assert.ok(new Set(days.map((p) => p[1].split('\n')[0])).size > 1);
 });
 
 test('replies are capped and every post fits in 280 characters', () => {
