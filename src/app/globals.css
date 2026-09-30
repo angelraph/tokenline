@@ -491,6 +491,7 @@ footer { border-top: 1px solid var(--line); margin-top: 72px; padding: 40px 0 32
   .mnav.landing-mnav { display: flex; }
   .cell-name { min-width: 0; }
   .grade { min-width: 38px; padding: 3px 6px; }
+  td.when span { display: block; }
   .cell-name { gap: 8px; }
   td:has(> .star), th[aria-label="Watchlist"] { width: 28px; padding-right: 0; }
   .cell-text { display: block; max-width: max(64px, calc(100vw - 292px)); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

@@ -85,7 +85,7 @@ export default async function Ledger() {
           <tbody>
             {events.map((e) => (
               <tr key={e.id}>
-                <td className="sub">{new Date(e.at).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</td>
+                <td className="sub when"><span>{new Date(e.at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span> <span>{new Date(e.at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</span></td>
                 <td className="hide-sm">{e.agentId ? names.get(e.agentId) ?? short(e.agentId) : <span className="sub">{e.type === 'buyback' ? 'Pool' : e.meta?.from ? short(String(e.meta.from)) : 'n/a'}</span>}</td>
                 <td><span className="pill">{e.type}</span></td>
                 <td className="sub hide-sm">
