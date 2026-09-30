@@ -54,7 +54,7 @@ test('header counts every move; replies tag only upgrades and new lines, best fi
 test('reads like a person: no symbols, and wording changes from day to day', () => {
   const moves = [move({ xHandle: 'big', delta: 80, to: 880, gradeTo: 'AAA' })];
   const days = [0, 1, 2, 3].map((d) => composeDigest(moves, since + d * 86_400_000, now + d * 86_400_000, base));
-  for (const posts of days) for (const p of posts) assert.doesNotMatch(p, /[25b225bc271320142013]/);
+  for (const posts of days) for (const p of posts) assert.doesNotMatch(p, /[\u25b2\u25bc\u2713\u2014\u2013]/);
   assert.ok(new Set(days.map((p) => p[0].split('\n')[0])).size > 1);
   assert.ok(new Set(days.map((p) => p[1].split('\n')[0])).size > 1);
 });
