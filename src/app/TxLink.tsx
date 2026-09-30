@@ -10,7 +10,7 @@ export function TxLink({ sig }: { sig: string | null }) {
   if (!sig) return <span className="sub">off-chain</span>;
   return (
     <a className="tx mono" href={`https://solscan.io/tx/${sig}`} target="_blank" rel="noreferrer" title={sig}>
-      {sig.slice(0, 5)}…{sig.slice(-5)} ↗
+      {sig.slice(0, 5)}…<span className="tx-tail">{sig.slice(-5)}</span> ↗
     </a>
   );
 }

@@ -41,9 +41,9 @@ export default async function Watch({ searchParams }: { searchParams: Promise<{ 
             <tbody>
               {moves.map((m) => (
                 <tr key={m.mint}>
-                  <td><Link href={`/agent/${m.mint}`}><strong>{m.project}</strong></Link> <span className="sub">${m.symbol}</span></td>
+                  <td><Link href={`/agent/${m.mint}`} className="name-trunc"><strong>{m.project}</strong></Link> <span className="sub hide-sm">${m.symbol}</span></td>
                   <td><span className={`pill ${m.kind === 'upgrade' || m.kind === 'newly_approved' ? 'live' : 'warn'}`}><span className="dot" />{LABEL[m.kind]}</span></td>
-                  <td className="num">{m.from} → {m.to} <span className="sub">({m.delta > 0 ? '+' : ''}{m.delta})</span></td>
+                  <td className="num"><span className="hide-sm">{m.from} → </span>{m.to} <span className="sub">({m.delta > 0 ? '+' : ''}{m.delta})</span></td>
                   <td className="num hide-sm">${m.lineFrom.toFixed(2)} → ${m.lineTo.toFixed(2)}</td>
                 </tr>
               ))}
@@ -61,7 +61,7 @@ export default async function Watch({ searchParams }: { searchParams: Promise<{ 
             <tbody>
               {dormant.map((r) => (
                 <tr key={r.mint}>
-                  <td><Link href={`/agent/${r.mint}`}><strong>{r.project}</strong></Link> <span className="sub">${r.symbol}</span></td>
+                  <td><Link href={`/agent/${r.mint}`} className="name-trunc"><strong>{r.project}</strong></Link> <span className="sub hide-sm">${r.symbol}</span></td>
                   <td><span className={`grade g-${r.grade}`}>{r.grade}</span></td>
                   <td className="num">{r.lastFeeAt ? `${Math.round((Date.now() - Date.parse(r.lastFeeAt)) / 86_400_000)}d ago` : 'never'}</td>
                 </tr>
