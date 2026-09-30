@@ -143,7 +143,7 @@ export default function Account() {
             <div className="section-head"><h2>Recent activity</h2><button className="btn" onClick={() => load(key)}>Refresh</button></div>
             <div className="table-wrap">
               <table>
-                <thead><tr><th>When</th><th>Type</th><th className="hide-sm">Detail</th><th>Transaction</th><th className="num">USD</th></tr></thead>
+                <thead><tr><th>When</th><th>Type</th><th className="hide-sm">Detail</th><th><span className="hide-sm">Transaction</span><span className="show-sm">Tx</span></th><th className="num">USD</th></tr></thead>
                 <tbody>
                   {me.recent.map((e) => (
                     <tr key={e.id}>

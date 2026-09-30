@@ -485,6 +485,10 @@ footer { border-top: 1px solid var(--line); margin-top: 72px; padding: 40px 0 32
   .watermark { font-size: 40px; }
 }
 
+/* phone-only labels */
+.show-sm { display: none; }
+@media (max-width: 720px) { .show-sm { display: inline; } }
+
 /* phones: keep key columns on screen and make every control easy to tap */
 .mnav.landing-mnav { display: none; }
 @media (max-width: 720px) {

@@ -81,7 +81,7 @@ export default async function Ledger() {
 
       <div className="table-wrap">
         <table>
-          <thead><tr><th>When</th><th className="hide-sm">Agent</th><th>Type</th><th className="hide-sm">Detail</th><th>Transaction</th><th className="num">USD</th></tr></thead>
+          <thead><tr><th>When</th><th className="hide-sm">Agent</th><th>Type</th><th className="hide-sm">Detail</th><th><span className="hide-sm">Transaction</span><span className="show-sm">Tx</span></th><th className="num">USD</th></tr></thead>
           <tbody>
             {events.map((e) => (
               <tr key={e.id}>
