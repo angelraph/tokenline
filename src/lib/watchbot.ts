@@ -7,6 +7,7 @@ export type BotMove = {
   kind: 'upgrade' | 'downgrade' | 'newly_approved' | 'line_pulled';
 };
 
+export const MIN_WINDOW_MS = 12 * 3_600_000;
 const LINK_LEN = 23; // X counts every link as 23 characters.
 export const xLength = (s: string) => s.replace(/https?:\/\/\S+/g, 'x'.repeat(LINK_LEN)).length;
 
@@ -25,7 +26,9 @@ export function windowLabel(since: number, now: number) {
  * Downgrades and paused lines are counted in the header but never singled out by tag.
  */
 export function composeDigest(moves: BotMove[], since: number, now: number, base: string, maxReplies = 4): string[] {
-  if (!moves.length) return [];
+  // Post only with a real day of history and at least one agent to celebrate; /watch still lists everything.
+  if (now - since < MIN_WINDOW_MS) return [];
+  if (!moves.some((m) => m.kind === 'upgrade' || m.kind === 'newly_approved')) return [];
   const up = moves.filter((m) => m.kind === 'upgrade');
   const down = moves.filter((m) => m.kind === 'downgrade');
   const approved = moves.filter((m) => m.kind === 'newly_approved');

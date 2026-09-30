@@ -58,6 +58,12 @@ test('replies are capped and every post fits in 280 characters', () => {
   for (const p of posts) assert.ok(xLength(p) <= 280, `${xLength(p)}: ${p}`);
 });
 
+test('stays quiet with under 12 hours of history or only bad news', () => {
+  assert.deepEqual(composeDigest([move({ delta: 50 })], now - 3 * 3_600_000, now, base), []);
+  assert.deepEqual(composeDigest([move({ kind: 'downgrade', delta: -40 })], since, now, base), []);
+  assert.equal(composeDigest([move({ delta: 50 })], now - 13 * 3_600_000, now, base).length, 2);
+});
+
 test('a short history window is labelled honestly', () => {
   assert.equal(windowLabel(now - 9 * 3_600_000, now), '9h');
   assert.equal(windowLabel(now - 23 * 3_600_000, now), '24h');

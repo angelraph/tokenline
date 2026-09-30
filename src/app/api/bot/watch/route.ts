@@ -31,7 +31,7 @@ async function run(req: Request) {
 
   const last = await store.getKv<Last>(LAST);
   if (preview) return ok({ posts, moves: moves.length, since: since ? new Date(since).toISOString() : null, configured: xConfigured(), last });
-  if (!posts.length) return ok({ posted: 0, reason: since ? 'no rating moves in the window' : 'no score history yet' });
+  if (!posts.length) return ok({ posted: 0, reason: since ? 'nothing to post: needs 12h of history and at least one upgrade or new credit line' : 'no score history yet' });
   if (!xConfigured()) return fail(503, 'X API keys are not configured', { posts });
   if (last && Date.now() - Date.parse(last.at) < MIN_GAP_MS) return ok({ posted: 0, reason: 'already posted today', last });
 
