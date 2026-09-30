@@ -86,7 +86,7 @@ export function BoardTable({ rows, deltas = {}, hasHistory = false }: { rows: Bo
           <thead>
             <tr>
               <th style={{ width: 34 }} aria-label="Watchlist" />
-              <th className="sortable" onClick={() => sortBy('rank')}>#{arrow('rank')}</th>
+              <th className="sortable hide-sm" onClick={() => sortBy('rank')}>#{arrow('rank')}</th>
               <th>Agent</th>
               <th>Grade</th>
               <th className="num sortable" onClick={() => sortBy('score')}>Score{arrow('score')}</th>
@@ -104,11 +104,11 @@ export function BoardTable({ rows, deltas = {}, hasHistory = false }: { rows: Bo
               return (
                 <tr key={r.mint}>
                   <td><button className={`star${stars.has(r.mint) ? ' on' : ''}`} aria-label={stars.has(r.mint) ? 'Remove from watchlist' : 'Add to watchlist'} onClick={() => toggleStar(r.mint)}>{stars.has(r.mint) ? '★' : '☆'}</button></td>
-                  <td className="sub">{r.rank}</td>
+                  <td className="sub hide-sm">{r.rank}</td>
                   <td>
                     <Link href={`/agent/${r.mint}`} className="cell-name">
                       <Avatar name={r.project} seed={r.mint} />
-                      <span><strong>{r.project}</strong> <span className="sub">${r.symbol}</span></span>
+                      <span className="cell-text"><strong>{r.project}</strong> <span className="sub hide-sm">${r.symbol}</span></span>
                     </Link>
                   </td>
                   <td><span className={`grade g-${r.grade}`}>{r.grade}</span></td>

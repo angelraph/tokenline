@@ -147,7 +147,7 @@ export default function Account() {
                 <tbody>
                   {me.recent.map((e) => (
                     <tr key={e.id}>
-                      <td className="sub">{new Date(e.at).toLocaleString()}</td>
+                      <td className="sub">{new Date(e.at).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</td>
                       <td>{e.type}</td>
                       <td className="sub hide-sm">
                         {e.type === 'draw' ? `${e.meta?.model} · ${e.meta?.inputTokens}+${e.meta?.outputTokens} tokens`

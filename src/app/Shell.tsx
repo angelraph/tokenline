@@ -68,6 +68,9 @@ export function Shell({ children }: { children: React.ReactNode }) {
             </div>
           </div>
         </nav>
+        <nav className="mnav landing-mnav" aria-label="Sections">
+          {[...NAV.slice(1), ...ACCOUNT, ...LEARN].map((n) => <Link key={n.href} href={n.href}>{n.label}</Link>)}
+        </nav>
         {children}
         <div className="wrap"><Footer /></div>
       </>

@@ -485,6 +485,33 @@ footer { border-top: 1px solid var(--line); margin-top: 72px; padding: 40px 0 32
   .watermark { font-size: 40px; }
 }
 
+/* phones: keep key columns on screen and make every control easy to tap */
+.mnav.landing-mnav { display: none; }
+@media (max-width: 720px) {
+  .mnav.landing-mnav { display: flex; }
+  .cell-name { min-width: 0; }
+  .grade { min-width: 38px; padding: 3px 6px; }
+  .cell-name { gap: 8px; }
+  td:has(> .star), th[aria-label="Watchlist"] { width: 28px; padding-right: 0; }
+  .cell-text { display: block; max-width: max(64px, calc(100vw - 292px)); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ptab { padding: 12px 11px; letter-spacing: 0.04em; }
+  td, th { padding: 11px 8px; }
+  td:first-child, th:first-child { padding-left: 12px; }
+  td:last-child, th:last-child { padding-right: 12px; }
+}
+@media (pointer: coarse) {
+  .star { padding: 10px; margin: -8px; }
+  .copy { padding: 10px; margin: -8px; }
+  a.tx { display: inline-block; padding: 10px 0; margin: -10px 0; }
+  td a { display: inline-block; padding: 8px 0; margin: -8px 0; }
+  .cell-name { padding: 6px 0; margin: -6px 0; }
+  .foot-strip a { display: inline-block; padding: 10px 4px; margin: -10px -4px; }
+  .foot a { padding: 9px 0; }
+  .mnav a { padding: 9px 14px; }
+  .nav-links a { padding: 12px 0; margin: -12px 0; }
+  .btn.sm { min-height: 34px; }
+}
+
 /* faq */
 .faq-group { margin: 28px 0; }
 .faq-group h2 { font: 500 11.5px var(--mono); color: var(--accent); text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 12px; }

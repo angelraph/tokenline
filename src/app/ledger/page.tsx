@@ -81,12 +81,12 @@ export default async function Ledger() {
 
       <div className="table-wrap">
         <table>
-          <thead><tr><th>When</th><th>Agent</th><th>Type</th><th className="hide-sm">Detail</th><th>Transaction</th><th className="num">USD</th></tr></thead>
+          <thead><tr><th>When</th><th className="hide-sm">Agent</th><th>Type</th><th className="hide-sm">Detail</th><th>Transaction</th><th className="num">USD</th></tr></thead>
           <tbody>
             {events.map((e) => (
               <tr key={e.id}>
-                <td className="sub">{new Date(e.at).toLocaleString()}</td>
-                <td>{e.agentId ? names.get(e.agentId) ?? short(e.agentId) : <span className="sub">{e.type === 'buyback' ? 'Pool' : e.meta?.from ? short(String(e.meta.from)) : 'n/a'}</span>}</td>
+                <td className="sub">{new Date(e.at).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</td>
+                <td className="hide-sm">{e.agentId ? names.get(e.agentId) ?? short(e.agentId) : <span className="sub">{e.type === 'buyback' ? 'Pool' : e.meta?.from ? short(String(e.meta.from)) : 'n/a'}</span>}</td>
                 <td><span className="pill">{e.type}</span></td>
                 <td className="sub hide-sm">
                   {e.type === 'draw' ? `${e.meta?.model} · ${Number(e.meta?.inputTokens) + Number(e.meta?.outputTokens)} tokens · ${e.meta?.x402Signature ? 'UsePod paid on-chain' : 'UsePod'}`
