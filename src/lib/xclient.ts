@@ -17,3 +17,10 @@ export async function postTweet(text: string, replyTo?: string): Promise<string>
   if (!res.ok || !body?.data?.id) throw new Error(`x ${res.status}: ${JSON.stringify(body).slice(0, 300)}`);
   return String(body.data.id);
 }
+
+/** Read-only credential check: which account the keys post as, or X's error. Posts nothing. */
+export async function whoAmI(): Promise<{ ok: boolean; status: number; body: unknown }> {
+  const url = 'https://api.x.com/2/users/me';
+  const res = await fetch(url, { headers: { authorization: authHeader('GET', url, config.xApi) }, signal: AbortSignal.timeout(15_000) });
+  return { ok: res.ok, status: res.status, body: await res.json().catch(() => null) };
+}

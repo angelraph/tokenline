@@ -4,12 +4,13 @@ import { fail, isCron, ok } from '@/lib/http';
 import { store } from '@/lib/store';
 import { movers, recordSnapshot } from '@/lib/watch';
 import { composeDigest } from '@/lib/watchbot';
-import { postTweet, xConfigured } from '@/lib/xclient';
+import { postTweet, whoAmI, xConfigured } from '@/lib/xclient';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 const LAST = 'bot:watch:last';
+const ERR = 'bot:watch:lastError';
 const MIN_GAP_MS = 20 * 3_600_000;
 
 type Last = { at: string; ids: string[]; url: string };
@@ -20,7 +21,10 @@ type Last = { at: string; ids: string[]; url: string };
  */
 async function run(req: Request) {
   if (!isCron(req)) return fail(401, 'cron secret required');
-  const preview = new URL(req.url).searchParams.get('preview') === '1';
+  const params = new URL(req.url).searchParams;
+  const preview = params.get('preview') === '1';
+  // Read-only: confirms which account the keys belong to, or returns X's error. Posts nothing.
+  if (params.get('check') === '1') return ok({ configured: xConfigured(), x: xConfigured() ? await whoAmI() : null, lastError: await store.getKv(ERR) });
 
   const { rows } = await board();
   await recordSnapshot(rows);
@@ -30,9 +34,12 @@ async function run(req: Request) {
   const posts = since ? composeDigest(moves.map((m) => ({ ...m, xHandle: handles.get(m.mint) ?? null })), since, Date.now(), base) : [];
 
   const last = await store.getKv<Last>(LAST);
-  if (preview) return ok({ posts, moves: moves.length, since: since ? new Date(since).toISOString() : null, configured: xConfigured(), last });
+  if (preview) return ok({ posts, moves: moves.length, since: since ? new Date(since).toISOString() : null, configured: xConfigured(), last, lastError: await store.getKv(ERR) });
   if (!posts.length) return ok({ posted: 0, reason: since ? 'nothing to post: needs 12h of history and at least one upgrade or new credit line' : 'no score history yet' });
-  if (!xConfigured()) return fail(503, 'X API keys are not configured', { posts });
+  if (!xConfigured()) {
+    await store.setKv(ERR, { at: new Date().toISOString(), error: 'X API keys are not configured' });
+    return fail(503, 'X API keys are not configured', { posts });
+  }
   if (last && Date.now() - Date.parse(last.at) < MIN_GAP_MS) return ok({ posted: 0, reason: 'already posted today', last });
 
   const ids: string[] = [];
@@ -40,6 +47,7 @@ async function run(req: Request) {
     for (const text of posts) ids.push(await postTweet(text, ids[ids.length - 1]));
   } catch (e) {
     // Record what did go out so a retry never duplicates the header.
+    await store.setKv(ERR, { at: new Date().toISOString(), error: (e as Error).message, postedIds: ids });
     if (ids.length) await store.setKv(LAST, { at: new Date().toISOString(), ids, url: `https://x.com/${config.xHandle}/status/${ids[0]}` });
     return fail(502, (e as Error).message, { postedIds: ids });
   }
