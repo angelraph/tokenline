@@ -36,10 +36,10 @@ export const config = {
   xHandle: process.env.X_HANDLE || 'tokenlinehq',
   /** X API user keys for @tokenlinehq (OAuth 1.0a, read and write). Only the Credit Watch bot uses them. */
   xApi: {
-    consumerKey: process.env.X_API_KEY || '',
-    consumerSecret: process.env.X_API_SECRET || '',
-    token: process.env.X_ACCESS_TOKEN || '',
-    tokenSecret: process.env.X_ACCESS_SECRET || '',
+    consumerKey: (process.env.X_API_KEY || '').trim(),
+    consumerSecret: (process.env.X_API_SECRET || '').trim(),
+    token: (process.env.X_ACCESS_TOKEN || '').trim(),
+    tokenSecret: (process.env.X_ACCESS_SECRET || '').trim(),
   },
   /** Price of one machine-readable credit report sold over x402. */
   reportPriceUsd: num(process.env.REPORT_PRICE_USD, 0.02),
