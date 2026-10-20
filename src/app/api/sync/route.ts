@@ -15,13 +15,16 @@ export const maxDuration = 60;
 async function run(req: Request) {
   if (!isCron(req)) return fail(401, 'cron secret required');
   try {
+    // Every step shares one deadline so the job always finishes inside Vercel's 60 second limit.
+    const deadline = Date.now() + 50_000;
+    const left = (cap: number) => Math.max(0, Math.min(cap, deadline - Date.now()));
     const chain = await syncOnchain();
     const feed = await getClawrena();
     const mints = feed.projects.map((p) => p.mint);
-    const activityChecked = feed.asOf ? await refreshActivity(mints, 15_000) : 0;
-    const holdersMeasured = await refreshHolders(mints, 250, 20_000);
-    const launchDatesFound = await refreshLaunchDates(mints, 8_000);
-    const creatorsMeasured = await refreshDevSells(mints, 60, 20_000);
+    const activityChecked = feed.asOf ? await refreshActivity(mints, left(14_000)) : 0;
+    const holdersMeasured = left(1) ? await refreshHolders(mints, 250, left(14_000)) : 0;
+    const launchDatesFound = left(1) ? await refreshLaunchDates(mints, left(6_000)) : 0;
+    const creatorsMeasured = left(1) ? await refreshDevSells(mints, 60, left(12_000)) : 0;
     return ok({ ...chain, activityChecked, holdersMeasured, launchDatesFound, creatorsMeasured });
   } catch (e) {
     return fail(502, (e as Error).message);

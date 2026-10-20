@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-type Preview = { posts: string[]; moves: number; since: string | null };
+type Preview = { product: string; posts: string[]; moves: number; since: string | null };
 
 const intent = (text: string, replyTo?: string) =>
   `https://x.com/intent/post?text=${encodeURIComponent(text)}${replyTo ? `&in_reply_to=${replyTo}` : ''}`;
@@ -40,10 +40,20 @@ export function BotDraft({ headers }: { headers: () => Record<string, string> })
         <p>The Credit Watch digest, ready to post from @tokenlinehq. Post the first one, paste its link below, then post each reply.</p></div></div>
       <button className="btn" onClick={load}>{data ? 'Refresh' : 'Load today’s thread'}</button>
       {err && <div className="callout warn" style={{ marginTop: 12 }}>{err}</div>}
+      {data?.product && (
+        <div className="card" style={{ marginTop: 14 }}>
+          <div className="sub" style={{ marginBottom: 8 }}>Today&apos;s product post (a new one every day, live numbers)</div>
+          <div style={{ whiteSpace: 'pre-wrap', fontSize: 14, lineHeight: 1.55, overflowWrap: 'anywhere' }}>{data.product}</div>
+          <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
+            <button className="btn sm" onClick={() => copy(-1, data.product)}>{copied === -1 ? 'Copied' : 'Copy'}</button>
+            <a className="btn primary sm" href={intent(data.product)} target="_blank" rel="noreferrer">Open in X</a>
+          </div>
+        </div>
+      )}
       {data && !data.posts.length && (
         <p className="sub" style={{ marginTop: 12 }}>
-          Nothing to post right now. A thread appears once there are 12 hours of score history and at least one upgrade or new
-          credit line ({data.moves} rating {data.moves === 1 ? 'move' : 'moves'} so far).
+          No Credit Watch thread today. It appears once there are 12 hours of score history and at least one upgrade or new
+          credit line ({data.moves} rating {data.moves === 1 ? 'move' : 'moves'} so far). The product post above is ready every day.
         </p>
       )}
       {data && data.posts.length > 0 && (

@@ -1,4 +1,5 @@
-import { board } from '@/lib/board';
+import { board, poolStats } from '@/lib/board';
+import { dailyProductPost } from '@/lib/dailypost';
 import { config } from '@/lib/config';
 import { fail, isCron, ok } from '@/lib/http';
 import { store } from '@/lib/store';
@@ -6,7 +7,7 @@ import { movers, recordSnapshot } from '@/lib/watch';
 import { composeDigest } from '@/lib/watchbot';
 import { postTweet, whoAmI, xConfigured } from '@/lib/xclient';
 import { sendText, telegramConfigured } from '@/lib/telegram';
-import { dailyMessage } from '@/lib/tgformat';
+import { dailyMessage, esc } from '@/lib/tgformat';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -36,17 +37,25 @@ async function run(req: Request) {
   const { since, moves } = await movers(rows, 24);
   const handles = new Map(rows.map((r) => [r.mint, r.xHandle]));
   const base = config.baseUrl.replace(/\/$/, '');
+  const pool = await poolStats();
+  const top = rows[0];
+  const product = dailyProductPost({
+    base, agents: rows.length, approved: rows.filter((r) => r.lineUsd > 0).length,
+    trading: rows.filter((r) => r.volume24hUsd >= 50).length,
+    top: top ? { project: top.project, xHandle: top.xHandle, grade: top.grade, score: top.score, monthlyCreatorUsd: top.monthlyCreatorUsd, mint: top.mint } : null,
+    draws: pool.draws, buybacks: pool.buybackCount, tokenMint: config.mints.tline,
+  }, Math.floor(Date.now() / 86_400_000));
   const posts = since ? composeDigest(moves.map((m) => ({ ...m, xHandle: handles.get(m.mint) ?? null })), since, Date.now(), base) : [];
 
   const last = await store.getKv<Last>(LAST);
-  if (preview) return ok({ posts, moves: moves.length, since: since ? new Date(since).toISOString() : null, autopost: config.xAutopost, configured: xConfigured(), last, lastError: await store.getKv(ERR), draft: await store.getKv(DRAFT) });
+  if (preview) return ok({ product, posts, moves: moves.length, since: since ? new Date(since).toISOString() : null, autopost: config.xAutopost, configured: xConfigured(), last, lastError: await store.getKv(ERR), draft: await store.getKv(DRAFT) });
   // Telegram channel: one post a day, the digest on good days and a board snapshot otherwise.
   let telegram: unknown = 'not configured';
   if (telegramConfigured() && config.telegram.channel) {
     const tgLast = await store.getKv<{ at: string }>(TG_DAILY);
     if (tgLast && Date.now() - Date.parse(tgLast.at) < MIN_GAP_MS) telegram = 'already posted today';
     else {
-      telegram = await sendText(config.telegram.channel, dailyMessage(posts, rows, base))
+      telegram = await sendText(config.telegram.channel, posts.length ? dailyMessage(posts, rows, base) : esc(product))
         .then(async () => { await store.setKv(TG_DAILY, { at: new Date().toISOString() }); return 'posted'; })
         .catch((e) => `failed: ${(e as Error).message}`);
     }
