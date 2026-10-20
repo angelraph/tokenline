@@ -17,3 +17,4 @@ skills-lock.json
 plugins/*/node_modules
 plugins/*/dist
 demo-video/
+marketing/
