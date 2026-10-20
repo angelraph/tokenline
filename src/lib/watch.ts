@@ -7,7 +7,8 @@ import { store } from './store';
 type Snapshot = { at: number; s: Record<string, [number, number]> }; // mint -> [score, lineUsd]
 
 // v3: seven signals (token age and creator behaviour added, weights rebalanced), so history restarts.
-const KEY = 'watch:snapshots:v3';
+// v4: scores are computed as of the feed's close once ClawPump's hackathon fee window ended, so history restarts.
+const KEY = 'watch:snapshots:v4';
 const EVERY_MS = 3_600_000;
 const KEEP_MS = 8 * 86_400_000;
 

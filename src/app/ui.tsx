@@ -55,3 +55,14 @@ export function Avatar({ name, seed, size = 26 }: { name: string; seed: string; 
     </span>
   );
 }
+
+/** Shown once ClawPump's hackathon fee feed has closed, so every score says which date it reflects. */
+export function FeedNote({ asOf }: { asOf: number | null | undefined }) {
+  if (!asOf) return null;
+  const day = new Date(asOf).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+  return (
+    <div className="callout warn" style={{ margin: '14px 0' }}>
+      ClawPump&apos;s AnsemHack fee feed closed on {day}. Scores and credit lines reflect creator fees recorded up to that date.
+    </div>
+  );
+}

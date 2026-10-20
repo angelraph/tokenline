@@ -10,7 +10,7 @@ import { history as scoreHistory } from '@/lib/watch';
 import { CopyButton, Tabs } from '../../Tabs';
 import { BuyReport } from './BuyReport';
 import { solUsd } from '@/lib/prices';
-import { avatarStyle, initials, Icon } from '../../ui';
+import { avatarStyle, FeedNote, initials, Icon } from '../../ui';
 
 export const dynamic = 'force-dynamic';
 
@@ -142,6 +142,7 @@ export default async function AgentPage({ params }: { params: Promise<{ mint: st
           </a>
         </div>
       </section>
+      <FeedNote asOf={r.asOf} />
 
       <div className="split">
         <Tabs watermark="Tokenline" panes={[

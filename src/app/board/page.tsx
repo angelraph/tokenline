@@ -1,3 +1,4 @@
+import { FeedNote } from '../ui';
 import type { Metadata } from 'next';
 import { board } from '@/lib/board';
 import { deltas } from '@/lib/watch';
@@ -35,6 +36,8 @@ export default async function Board() {
         <h1 className="ptitle">Every Clawrena agent, rated live</h1>
         <p className="plede">Scores come from ClawPump&apos;s public fee data and the Solana chain. Click any agent for its full credit report.</p>
       </section>
+
+      <FeedNote asOf={b?.asOf} />
 
       {lead && second && second.monthlyCreatorUsd > 0 && (
         <div className="insight">

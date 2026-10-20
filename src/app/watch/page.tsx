@@ -1,3 +1,4 @@
+import { FeedNote } from '../ui';
 import Link from 'next/link';
 import { board } from '@/lib/board';
 import { movers, type Move } from '@/lib/watch';
@@ -10,7 +11,7 @@ const LABEL: Record<Move['kind'], string> = {
 
 export default async function Watch({ searchParams }: { searchParams: Promise<{ hours?: string }> }) {
   const hours = Math.min(168, Math.max(1, Number((await searchParams).hours) || 24));
-  const { rows } = await board();
+  const { rows, asOf } = await board();
   const { since, moves } = await movers(rows, hours);
   const dormant = rows.filter((r) => r.stale && r.score >= 300).slice(0, 12);
 
@@ -27,6 +28,7 @@ export default async function Watch({ searchParams }: { searchParams: Promise<{ 
           ))}
         </div>
       </section>
+      <FeedNote asOf={asOf} />
 
       <div className="section">
         <div className="section-head">

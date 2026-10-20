@@ -18,6 +18,8 @@ export type ClawrenaFeed = {
   solPriceUsd: number;
   totals: { projects: number; projectsEarning: number; grossFeesSol: number; volumeUsd: number };
   projects: ClawrenaProject[];
+  /** Set once the feed's fee window has closed: scores are computed as of that moment, not today. */
+  asOf: number | null;
   fetchedAt: number;
 };
 
@@ -47,6 +49,7 @@ export async function getClawrena(): Promise<ClawrenaFeed> {
         volumeSol: Number(p.volumeSol) || 0,
         volume24hUsd: Number(p.volume24hUsd) || 0,
       })),
+      asOf: j.hasEnded && j.window?.end && Number.isFinite(Date.parse(j.window.end)) ? Date.parse(j.window.end) : null,
       fetchedAt: Date.now(),
     };
     return cache;

@@ -28,7 +28,7 @@ export type BoardRow = {
   outstandingUsd: number;
 };
 
-export async function board(): Promise<{ rows: BoardRow[]; solPriceUsd: number; projects: number }> {
+export async function board(): Promise<{ rows: BoardRow[]; solPriceUsd: number; projects: number; asOf: number | null }> {
   const [feed, agents, events, holders, signals] = await Promise.all([
     getClawrena(), store.listAgents(), store.listEvents({ limit: 100_000 }), holderCache(), signalCaches(),
   ]);
@@ -45,6 +45,7 @@ export async function board(): Promise<{ rows: BoardRow[]; solPriceUsd: number; 
     const t = agent ? tally(events.filter((e) => e.agentId === agent.id)) : null;
     const s = scoreAgent({
       ...p, ...signalsFor(signals, p.mint, p.firstFeeAt), solPriceUsd: feed.solPriceUsd, top10Share: freshShare(holders, p.mint), whaleExitShare: freshExit(holders, p.mint), history: t ?? undefined,
+      now: feed.asOf ?? undefined,
     }, config.policy);
     return {
       rank: 0, mint: p.mint, project: p.projectName, symbol: p.symbol, xHandle: p.xHandle,
@@ -65,7 +66,7 @@ export async function board(): Promise<{ rows: BoardRow[]; solPriceUsd: number; 
     && feed.projects.filter((p) => signalsFor(signals, p.mint, p.firstFeeAt).launchedAt !== undefined).length / n >= 0.9
     && covered((m) => signals.dev[m] !== undefined) >= 0.9;
   if (ready) await recordSnapshot(rows).catch(() => undefined);
-  return { rows, solPriceUsd: feed.solPriceUsd, projects: feed.projects.length };
+  return { rows, solPriceUsd: feed.solPriceUsd, projects: feed.projects.length, asOf: feed.asOf };
 }
 
 export async function poolStats() {
