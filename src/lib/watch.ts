@@ -8,7 +8,8 @@ type Snapshot = { at: number; s: Record<string, [number, number]> }; // mint -> 
 
 // v3: seven signals (token age and creator behaviour added, weights rebalanced), so history restarts.
 // v4: scores are computed as of the feed's close once ClawPump's hackathon fee window ended, so history restarts.
-const KEY = 'watch:snapshots:v4';
+// v5: recency, momentum and age come from live trading activity after the feed closed.
+const KEY = 'watch:snapshots:v5';
 const EVERY_MS = 3_600_000;
 const KEEP_MS = 8 * 86_400_000;
 

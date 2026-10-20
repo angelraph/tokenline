@@ -1,3 +1,4 @@
+import { activityCache, activityCoverage, refreshActivity } from './activity';
 import { config } from './config';
 import { getClawrena } from './clawrena';
 import { scoreAgent, type Grade } from './score';
@@ -29,13 +30,14 @@ export type BoardRow = {
 };
 
 export async function board(): Promise<{ rows: BoardRow[]; solPriceUsd: number; projects: number; asOf: number | null }> {
-  const [feed, agents, events, holders, signals] = await Promise.all([
-    getClawrena(), store.listAgents(), store.listEvents({ limit: 100_000 }), holderCache(), signalCaches(),
+  const [feed, agents, events, holders, signals, activity] = await Promise.all([
+    getClawrena(), store.listAgents(), store.listEvents({ limit: 100_000 }), holderCache(), signalCaches(), activityCache(),
   ]);
   const byMint = new Map(agents.filter((a) => a.mint).map((a) => [a.mint!, a]));
   const mints = feed.projects.map((p) => p.mint);
   // Fill missing measurements after the response is sent, so pages stay fast.
   waitUntil((async () => {
+    if (feed.asOf) await refreshActivity(mints).catch(() => 0);
     await refreshHolders(mints).catch(() => 0);
     await refreshLaunchDates(mints).catch(() => 0);
     await refreshDevSells(mints, 10).catch(() => 0);
@@ -45,13 +47,13 @@ export async function board(): Promise<{ rows: BoardRow[]; solPriceUsd: number; 
     const t = agent ? tally(events.filter((e) => e.agentId === agent.id)) : null;
     const s = scoreAgent({
       ...p, ...signalsFor(signals, p.mint, p.firstFeeAt), solPriceUsd: feed.solPriceUsd, top10Share: freshShare(holders, p.mint), whaleExitShare: freshExit(holders, p.mint), history: t ?? undefined,
-      now: feed.asOf ?? undefined,
+      now: feed.asOf ?? undefined, live: feed.asOf ? activity[p.mint] : undefined,
     }, config.policy);
     return {
       rank: 0, mint: p.mint, project: p.projectName, symbol: p.symbol, xHandle: p.xHandle,
       score: s.score, grade: s.grade, lineUsd: s.lineUsd, monthlyCreatorUsd: s.monthlyCreatorUsd,
       feesSol: Math.round((p.grossFeesSol - p.platformFeesSol) * 1000) / 1000,
-      volume24hUsd: p.volume24hUsd, lastFeeAt: p.lastFeeAt, stale: s.stale,
+      volume24hUsd: feed.asOf && activity[p.mint] ? activity[p.mint].vol24 : p.volume24hUsd, lastFeeAt: p.lastFeeAt, stale: s.stale,
       onTokenline: !!agent, verified: !!agent?.verified, outstandingUsd: t ? Math.round(t.outstandingUsd * 100) / 100 : 0,
     };
   });
@@ -64,7 +66,8 @@ export async function board(): Promise<{ rows: BoardRow[]; solPriceUsd: number; 
   const ready = n > 0
     && covered((m) => freshShare(holders, m) !== undefined) >= 0.9
     && feed.projects.filter((p) => signalsFor(signals, p.mint, p.firstFeeAt).launchedAt !== undefined).length / n >= 0.9
-    && covered((m) => signals.dev[m] !== undefined) >= 0.9;
+    && covered((m) => signals.dev[m] !== undefined) >= 0.9
+    && (!feed.asOf || activityCoverage(activity, mints) >= 0.9);
   if (ready) await recordSnapshot(rows).catch(() => undefined);
   return { rows, solPriceUsd: feed.solPriceUsd, projects: feed.projects.length, asOf: feed.asOf };
 }

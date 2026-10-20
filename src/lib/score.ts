@@ -1,3 +1,5 @@
+import { hoursSinceActive, type Activity } from './activitycore.ts';
+
 // Tokenline underwriting model. Pure and deterministic: the same inputs always
 // give the same score, so anyone can recompute a grade from public data.
 
@@ -20,6 +22,8 @@ export type ScoreInput = {
   /** Tokenline's own history with this agent. */
   history?: { drawnUsd: number; repaidUsd: number; overdue: boolean };
   now?: number;
+  /** Live trading activity once the fee feed has closed: drives recency, momentum and age instead of the frozen feed. */
+  live?: Activity;
 };
 
 export type Policy = { baseLineCapUsd: number; staleDays: number };
@@ -55,7 +59,10 @@ export function scoreAgent(i: ScoreInput, policy: Policy): ScoreResult {
   const first = i.firstFeeAt ? Date.parse(i.firstFeeAt) : NaN;
   const last = i.lastFeeAt ? Date.parse(i.lastFeeAt) : NaN;
   const daysLive = Number.isFinite(first) ? Math.max(1, (now - first) / DAY) : 0;
-  const hoursSinceFee = Number.isFinite(last) ? (now - last) / 3_600_000 : Infinity;
+  const live = i.live;
+  const hoursSinceFee = live ? hoursSinceActive(live, last) : Number.isFinite(last) ? (now - last) / 3_600_000 : Infinity;
+  const volume24hUsd = live ? live.vol24 : i.volume24hUsd;
+  const clock = live ? live.checkedAt : now;
 
   const creatorFeesSol = Math.max(0, i.grossFeesSol - i.platformFeesSol);
   const monthlyCreatorUsd = daysLive ? (creatorFeesSol * i.solPriceUsd * 30) / daysLive : 0;
@@ -70,20 +77,22 @@ export function scoreAgent(i: ScoreInput, policy: Policy): ScoreResult {
 
   const recency = hoursSinceFee <= 24 ? 175 : hoursSinceFee <= 72 ? 130 : hoursSinceFee <= 168 ? 70 : 0;
   add('recency', 'Fee recency', recency, 175,
-    Number.isFinite(hoursSinceFee) ? `last fee ${Math.round(hoursSinceFee)}h ago` : 'no fees collected yet');
+    live
+      ? (hoursSinceFee <= 24 ? 'trading in the last 24h (live)' : Number.isFinite(hoursSinceFee) ? `no trading seen for ${Math.round(hoursSinceFee)}h (live)` : 'no trading seen (live)')
+      : Number.isFinite(hoursSinceFee) ? `last fee ${Math.round(hoursSinceFee)}h ago` : 'no fees collected yet');
 
   const perDay = daysLive ? i.collections / daysLive : 0;
   add('consistency', 'Consistency', clamp(perDay / 2) * 105 + clamp(daysLive / 30) * 70, 175,
     `${i.collections} fee collections over ${Math.round(daysLive)} days`);
 
-  add('momentum', 'Market momentum', 125 * logScale(i.volume24hUsd, 100_000), 125,
-    `$${Math.round(i.volume24hUsd).toLocaleString('en-US')} 24h volume`);
+  add('momentum', 'Market momentum', 125 * logScale(volume24hUsd, 100_000), 125,
+    `$${Math.round(volume24hUsd).toLocaleString('en-US')} 24h volume${live ? ' (live)' : ''}`);
 
   const dist = i.top10Share === undefined ? 50 : 100 * (1 - clamp((i.top10Share - 0.2) / 0.6));
   add('distribution', 'Holder distribution', dist, 100,
     i.top10Share === undefined ? 'not yet measured (neutral)' : `top 10 hold ${Math.round(i.top10Share * 100)}%`);
 
-  const ageDays = i.launchedAt === undefined ? undefined : Math.max(0, (now - i.launchedAt) / DAY);
+  const ageDays = i.launchedAt === undefined ? undefined : Math.max(0, (clock - i.launchedAt) / DAY);
   add('age', 'Token age', ageDays === undefined ? 25 : 50 * clamp(ageDays / 30), 50,
     ageDays === undefined ? 'trading start not yet known (neutral)' : `trading for ${Math.round(ageDays)} days`);
 

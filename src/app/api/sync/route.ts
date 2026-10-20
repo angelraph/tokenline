@@ -1,6 +1,7 @@
 import { syncOnchain } from '@/lib/sync';
 import { getClawrena } from '@/lib/clawrena';
 import { refreshHolders } from '@/lib/holders';
+import { refreshActivity } from '@/lib/activity';
 import { refreshDevSells, refreshLaunchDates } from '@/lib/signals';
 import { ok, fail, isCron } from '@/lib/http';
 
@@ -17,10 +18,11 @@ async function run(req: Request) {
     const chain = await syncOnchain();
     const feed = await getClawrena();
     const mints = feed.projects.map((p) => p.mint);
+    const activityChecked = feed.asOf ? await refreshActivity(mints, 15_000) : 0;
     const holdersMeasured = await refreshHolders(mints, 250, 20_000);
     const launchDatesFound = await refreshLaunchDates(mints, 8_000);
     const creatorsMeasured = await refreshDevSells(mints, 60, 20_000);
-    return ok({ ...chain, holdersMeasured, launchDatesFound, creatorsMeasured });
+    return ok({ ...chain, activityChecked, holdersMeasured, launchDatesFound, creatorsMeasured });
   } catch (e) {
     return fail(502, (e as Error).message);
   }

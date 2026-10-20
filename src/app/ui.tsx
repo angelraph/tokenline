@@ -62,7 +62,7 @@ export function FeedNote({ asOf }: { asOf: number | null | undefined }) {
   const day = new Date(asOf).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
   return (
     <div className="callout warn" style={{ margin: '14px 0' }}>
-      ClawPump&apos;s AnsemHack fee feed closed on {day}. Scores and credit lines reflect creator fees recorded up to that date.
+      ClawPump&apos;s AnsemHack fee feed closed on {day}. Creator revenue reflects fees recorded up to that date; trading activity, momentum and token age are live from ClawPump.
     </div>
   );
 }

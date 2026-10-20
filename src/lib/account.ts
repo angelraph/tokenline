@@ -1,3 +1,4 @@
+import { activityCache, refreshActivity } from './activity';
 import { config } from './config';
 import { findProject } from './clawrena';
 import { tokenBalance } from './helius';
@@ -52,16 +53,17 @@ export function tally(events: LedgerEvent[]) {
 export async function scoreForMint(mint: string, history?: { drawnUsd: number; repaidUsd: number; overdue: boolean }) {
   const { feed, project } = await findProject(mint);
   if (!project) return null;
-  const [top10, signals] = await Promise.all([holderShare(mint), signalCaches()]);
+  const [top10, signals, activity] = await Promise.all([holderShare(mint), signalCaches(), activityCache()]);
   const exit = freshExit(await holderCache(), mint);
   // Read the same cached signals as the board; fill any gaps for this mint in the background.
   waitUntil((async () => {
+    if (feed.asOf) await refreshActivity([mint], 4_000).catch(() => 0);
     await refreshLaunchDates([mint], 5_000).catch(() => 0);
     await refreshDevSells([mint], 1, 12_000).catch(() => 0);
   })());
   return {
     project,
-    score: scoreAgent({ ...project, ...signalsFor(signals, mint, project.firstFeeAt), solPriceUsd: feed.solPriceUsd, top10Share: top10, whaleExitShare: exit, history, now: feed.asOf ?? undefined }, config.policy),
+    score: scoreAgent({ ...project, ...signalsFor(signals, mint, project.firstFeeAt), solPriceUsd: feed.solPriceUsd, top10Share: top10, whaleExitShare: exit, history, now: feed.asOf ?? undefined, live: feed.asOf ? activity[mint] : undefined }, config.policy),
     asOf: feed.asOf,
   };
 }
