@@ -37,6 +37,11 @@ export const config = {
   /** X API user keys for @tokenlinehq (OAuth 1.0a, read and write). Only the Credit Watch bot uses them. */
   /** Post the daily Credit Watch thread through the X API (needs paid X credits). Otherwise it is saved as a draft for the operator. */
   xAutopost: process.env.X_AUTOPOST === '1',
+  /** Telegram bot (free API). The channel gets the daily digest; the bot answers /score and friends. */
+  telegram: {
+    token: (process.env.TELEGRAM_BOT_TOKEN || '').trim(),
+    channel: (process.env.TELEGRAM_CHANNEL || '').trim(),
+  },
   xApi: {
     consumerKey: (process.env.X_API_KEY || '').trim(),
     consumerSecret: (process.env.X_API_SECRET || '').trim(),

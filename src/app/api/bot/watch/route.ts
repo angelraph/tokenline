@@ -5,6 +5,8 @@ import { store } from '@/lib/store';
 import { movers, recordSnapshot } from '@/lib/watch';
 import { composeDigest } from '@/lib/watchbot';
 import { postTweet, whoAmI, xConfigured } from '@/lib/xclient';
+import { sendText, telegramConfigured } from '@/lib/telegram';
+import { dailyMessage } from '@/lib/tgformat';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -12,6 +14,7 @@ export const maxDuration = 60;
 const LAST = 'bot:watch:last';
 const ERR = 'bot:watch:lastError';
 const DRAFT = 'bot:watch:draft';
+const TG_DAILY = 'bot:telegram:last';
 const MIN_GAP_MS = 20 * 3_600_000;
 
 type Last = { at: string; ids: string[]; url: string };
@@ -37,12 +40,24 @@ async function run(req: Request) {
 
   const last = await store.getKv<Last>(LAST);
   if (preview) return ok({ posts, moves: moves.length, since: since ? new Date(since).toISOString() : null, autopost: config.xAutopost, configured: xConfigured(), last, lastError: await store.getKv(ERR), draft: await store.getKv(DRAFT) });
-  if (!posts.length) return ok({ posted: 0, reason: since ? 'nothing to post: needs 12h of history and at least one upgrade or new credit line' : 'no score history yet' });
+  // Telegram channel: one post a day, the digest on good days and a board snapshot otherwise.
+  let telegram: unknown = 'not configured';
+  if (telegramConfigured() && config.telegram.channel) {
+    const tgLast = await store.getKv<{ at: string }>(TG_DAILY);
+    if (tgLast && Date.now() - Date.parse(tgLast.at) < MIN_GAP_MS) telegram = 'already posted today';
+    else {
+      telegram = await sendText(config.telegram.channel, dailyMessage(posts, rows, base))
+        .then(async () => { await store.setKv(TG_DAILY, { at: new Date().toISOString() }); return 'posted'; })
+        .catch((e) => `failed: ${(e as Error).message}`);
+    }
+  }
+
+  if (!posts.length) return ok({ posted: 0, telegram, reason: since ? 'nothing to post: needs 12h of history and at least one upgrade or new credit line' : 'no score history yet' });
   // Draft mode (default): save the thread for the operator to post by hand from the admin page.
   if (!config.xAutopost) {
     const draft = { at: new Date().toISOString(), since: new Date(since!).toISOString(), posts };
     await store.setKv(DRAFT, draft);
-    return ok({ posted: 0, draft });
+    return ok({ posted: 0, draft, telegram });
   }
   if (!xConfigured()) {
     await store.setKv(ERR, { at: new Date().toISOString(), error: 'X API keys are not configured' });
