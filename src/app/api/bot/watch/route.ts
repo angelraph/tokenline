@@ -11,12 +11,14 @@ export const maxDuration = 60;
 
 const LAST = 'bot:watch:last';
 const ERR = 'bot:watch:lastError';
+const DRAFT = 'bot:watch:draft';
 const MIN_GAP_MS = 20 * 3_600_000;
 
 type Last = { at: string; ids: string[]; url: string };
 
 /**
- * Daily Credit Watch thread on X. Called by cron; `?preview=1` returns the thread without posting.
+ * Daily Credit Watch thread for X. Called by cron; `?preview=1` returns the thread without posting.
+ * By default the thread is saved as a draft for the operator; X_AUTOPOST=1 posts it through the X API.
  * Posts at most once every 20 hours and stays silent when no agent moved.
  */
 async function run(req: Request) {
@@ -34,8 +36,14 @@ async function run(req: Request) {
   const posts = since ? composeDigest(moves.map((m) => ({ ...m, xHandle: handles.get(m.mint) ?? null })), since, Date.now(), base) : [];
 
   const last = await store.getKv<Last>(LAST);
-  if (preview) return ok({ posts, moves: moves.length, since: since ? new Date(since).toISOString() : null, configured: xConfigured(), last, lastError: await store.getKv(ERR) });
+  if (preview) return ok({ posts, moves: moves.length, since: since ? new Date(since).toISOString() : null, autopost: config.xAutopost, configured: xConfigured(), last, lastError: await store.getKv(ERR), draft: await store.getKv(DRAFT) });
   if (!posts.length) return ok({ posted: 0, reason: since ? 'nothing to post: needs 12h of history and at least one upgrade or new credit line' : 'no score history yet' });
+  // Draft mode (default): save the thread for the operator to post by hand from the admin page.
+  if (!config.xAutopost) {
+    const draft = { at: new Date().toISOString(), since: new Date(since!).toISOString(), posts };
+    await store.setKv(DRAFT, draft);
+    return ok({ posted: 0, draft });
+  }
   if (!xConfigured()) {
     await store.setKv(ERR, { at: new Date().toISOString(), error: 'X API keys are not configured' });
     return fail(503, 'X API keys are not configured', { posts });

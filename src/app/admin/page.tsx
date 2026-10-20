@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { BotDraft } from './BotDraft';
 
 type A = { id: string; name: string; wallet: string; mint: string | null; xHandle: string | null; verified: boolean; frozen: boolean; createdAt: string };
 
@@ -88,6 +89,7 @@ export default function Admin() {
               </tbody>
             </table>
           </div>
+          <BotDraft headers={() => h()} />
         </>
       )}
     </main>
