@@ -2,7 +2,14 @@
 
 import { useState } from 'react';
 
-type Preview = { product: string; posts: string[]; moves: number; since: string | null };
+type Drafts = { morning: string; midday: string; evening: string };
+type Preview = { drafts: Drafts; posts: string[]; moves: number; since: string | null };
+
+const SLOTS: { key: keyof Drafts; label: string }[] = [
+  { key: 'morning', label: 'Morning: product' },
+  { key: 'midday', label: 'Midday: live data' },
+  { key: 'evening', label: 'Evening: build log or receipts' },
+];
 
 const intent = (text: string, replyTo?: string) =>
   `https://x.com/intent/post?text=${encodeURIComponent(text)}${replyTo ? `&in_reply_to=${replyTo}` : ''}`;
@@ -36,24 +43,28 @@ export function BotDraft({ headers }: { headers: () => Record<string, string> })
 
   return (
     <div className="section">
-      <div className="section-head"><div><h2>Today&apos;s X thread</h2>
-        <p>The Credit Watch digest, ready to post from @tokenlinehq. Post the first one, paste its link below, then post each reply.</p></div></div>
-      <button className="btn" onClick={load}>{data ? 'Refresh' : 'Load today’s thread'}</button>
+      <div className="section-head"><div><h2>Today&apos;s posts</h2>
+        <p>Three posts for @tokenlinehq, written from live numbers: morning, midday and evening. On days with upgrades the Credit Watch thread appears below them.</p></div></div>
+      <button className="btn" onClick={load}>{data ? 'Refresh' : 'Load today’s posts'}</button>
       {err && <div className="callout warn" style={{ marginTop: 12 }}>{err}</div>}
-      {data?.product && (
-        <div className="card" style={{ marginTop: 14 }}>
-          <div className="sub" style={{ marginBottom: 8 }}>Today&apos;s product post (a new one every day, live numbers)</div>
-          <div style={{ whiteSpace: 'pre-wrap', fontSize: 14, lineHeight: 1.55, overflowWrap: 'anywhere' }}>{data.product}</div>
-          <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
-            <button className="btn sm" onClick={() => copy(-1, data.product)}>{copied === -1 ? 'Copied' : 'Copy'}</button>
-            <a className="btn primary sm" href={intent(data.product)} target="_blank" rel="noreferrer">Open in X</a>
-          </div>
+      {data?.drafts && (
+        <div style={{ display: 'grid', gap: 12, marginTop: 14 }}>
+          {SLOTS.map((slot, n) => (
+            <div className="card" key={slot.key}>
+              <div className="sub" style={{ marginBottom: 8 }}>{slot.label} · new every day, live numbers</div>
+              <div style={{ whiteSpace: 'pre-wrap', fontSize: 14, lineHeight: 1.55, overflowWrap: 'anywhere' }}>{data.drafts[slot.key]}</div>
+              <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
+                <button className="btn sm" onClick={() => copy(-1 - n, data.drafts[slot.key])}>{copied === -1 - n ? 'Copied' : 'Copy'}</button>
+                <a className="btn primary sm" href={intent(data.drafts[slot.key])} target="_blank" rel="noreferrer">Open in X</a>
+              </div>
+            </div>
+          ))}
         </div>
       )}
       {data && !data.posts.length && (
         <p className="sub" style={{ marginTop: 12 }}>
           No Credit Watch thread today. It appears once there are 12 hours of score history and at least one upgrade or new
-          credit line ({data.moves} rating {data.moves === 1 ? 'move' : 'moves'} so far). The product post above is ready every day.
+          credit line ({data.moves} rating {data.moves === 1 ? 'move' : 'moves'} so far). The three posts above are ready every day.
         </p>
       )}
       {data && data.posts.length > 0 && (
