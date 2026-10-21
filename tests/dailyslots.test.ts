@@ -39,7 +39,8 @@ test('evening announces a real ship for 36 hours, otherwise a ledger receipt', (
   assert.equal(new Set(receipts).size, 3);
   for (const p of receipts) assert.ok(xLength(p) <= 280, p);
   assert.match(receipts.join('\n'), /\$0\.98 repaid from agent wallets/);
-  assert.equal(recentShip(Date.parse('2026-10-21T10:00:00Z'))?.startsWith('Live trading activity'), true);
+  assert.equal(recentShip(Date.parse('2026-10-21T10:00:00Z'))?.startsWith('Holder alerts'), true);
+  assert.equal(recentShip(Date.parse('2026-10-21T07:00:00Z'))?.startsWith('Live trading activity'), true);
   assert.equal(recentShip(Date.parse('2026-12-01T00:00:00Z')), null);
 });
 

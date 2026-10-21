@@ -2,6 +2,7 @@
 // Add an entry only when the feature is live in production.
 
 export const CHANGELOG: { at: string; text: string }[] = [
+  { at: '2026-10-21T08:00:00Z', text: 'Holder alerts: wallets holding 100k+ $TOKENL get live Credit Watch alerts in Telegram. Upgrades, new credit lines and volume spikes as they happen. Send /alerts to @tokenhqbot.' },
   { at: '2026-10-20T20:00:00Z', text: 'Live trading activity now drives fee recency, market momentum and token age on every agent\'s credit score, refreshed through the day.' },
   { at: '2026-10-20T14:00:00Z', text: '@tokenhqbot is live on Telegram. Send /score with any Clawrena agent and get its full credit report in two seconds.' },
 ];
