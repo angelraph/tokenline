@@ -17,7 +17,7 @@ test('the creator-fee promise only appears once the rule is set', () => {
   assert.match(t, /part of the 25% of creator fees we put back into \$TOKENL, as promised/);
   assert.ok(xLength(t) <= 280);
   const a = buybackAnnouncement(25, 'https://tokenline.vercel.app');
-  assert.match(a, /^New rule for \$TOKENL: 25% of every creator fee withdrawal buys \$TOKENL/);
+  assert.match(a, /^New rule for \$TOKENL: 25% of Tokenline's creator fees buys \$TOKENL/);
   assert.ok(xLength(a) <= 280);
 });
 
