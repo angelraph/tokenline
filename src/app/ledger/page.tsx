@@ -86,11 +86,12 @@ export default async function Ledger() {
             {events.map((e) => (
               <tr key={e.id}>
                 <td className="sub when"><span>{new Date(e.at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span> <span>{new Date(e.at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</span></td>
-                <td className="hide-sm">{e.agentId ? names.get(e.agentId) ?? short(e.agentId) : <span className="sub">{e.type === 'buyback' ? 'Pool' : e.meta?.from ? short(String(e.meta.from)) : 'n/a'}</span>}</td>
+                <td className="hide-sm">{e.agentId ? names.get(e.agentId) ?? short(e.agentId) : <span className="sub">{e.type === 'buyback' ? (e.meta?.from === 'clawpump' ? 'ClawPump' : 'Pool') : e.type === 'burn' ? 'ClawPump' : e.meta?.from ? short(String(e.meta.from)) : 'n/a'}</span>}</td>
                 <td><span className="pill">{e.type}</span></td>
                 <td className="sub hide-sm">
                   {e.type === 'draw' ? `${e.meta?.model} · ${Number(e.meta?.inputTokens) + Number(e.meta?.outputTokens)} tokens · ${e.meta?.x402Signature ? 'UsePod paid on-chain' : 'UsePod'}`
-                    : e.type === 'buyback' ? `bought ${qty(Number(e.amount))} ${symbol(e.asset ?? '')} on the market`
+                    : e.type === 'buyback' ? `bought ${qty(Number(e.amount))} ${symbol(e.asset ?? '')} ${e.meta?.from === 'clawpump' ? 'automatically from creator fees' : 'on the market'}`
+                    : e.type === 'burn' ? `burned ${qty(Number(e.amount))} ${symbol(e.asset ?? '')}`
                     : e.amount ? `${e.amount} ${symbol(e.asset ?? '')}${e.meta?.from ? ` from ${short(String(e.meta.from))}` : ''}`
                     : e.meta?.action ? String(e.meta.action) : ''}
                 </td>

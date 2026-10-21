@@ -2,7 +2,7 @@ import { config } from './config';
 import { addressTransactions, type EnhancedTx } from './helius';
 import { assetUsd } from './prices';
 import { store } from './store';
-import { classify } from './classify';
+import { classify, classifyAutoBuyback } from './classify';
 
 const DUST_USD = 0.001;
 
@@ -18,10 +18,10 @@ export async function ingest(txs: EnhancedTx[]) {
   for (const tx of txs) {
     // Report purchases are booked as sales at checkout; don't count them twice.
     if ((await store.eventsForSignature(tx.signature)).some((e) => e.type === 'sale')) continue;
-    for (const c of classify(tx, byWallet, wallets())) {
+    for (const c of [...classify(tx, byWallet, wallets()), ...classifyAutoBuyback(tx, config.autoBuybackWallet, config.mints.tline, config.autoBuybackSince)]) {
       const px = await assetUsd(c.asset);
       const usd = c.amount * px;
-      if (usd < DUST_USD && c.type !== 'collateral' && c.type !== 'collateral_release') continue;
+      if (usd < DUST_USD && !['collateral', 'collateral_release', 'buyback', 'burn'].includes(c.type)) continue;
       const ok = await store.addEvent({
         agentId: c.agentId, type: c.type, amountUsd: usd, asset: c.asset, amount: c.amount,
         // One tx can hold several transfers; suffix keeps each one unique yet idempotent.
@@ -37,7 +37,7 @@ export async function ingest(txs: EnhancedTx[]) {
 
 /** Pull new transactions for the pool and escrow wallets since the last cursor. */
 export async function syncOnchain() {
-  const addrs = [...new Set([config.poolWallet, config.escrowWallet].filter(Boolean))];
+  const addrs = [...new Set([config.poolWallet, config.escrowWallet, config.autoBuybackWallet].filter(Boolean))];
   if (!addrs.length) return { added: 0, note: 'POOL_WALLET not configured' };
   let added = 0;
   for (const addr of addrs) {

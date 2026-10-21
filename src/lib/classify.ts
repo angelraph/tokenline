@@ -13,7 +13,7 @@ export type ChainTx = {
 };
 
 export type Classified = {
-  type: 'repay' | 'collateral' | 'collateral_release' | 'deposit' | 'buyback';
+  type: 'repay' | 'collateral' | 'collateral_release' | 'deposit' | 'buyback' | 'burn';
   agentId: string | null;
   asset: string;
   amount: number;
@@ -75,3 +75,24 @@ export function classify(tx: ChainTx, byWallet: Map<string, { id: string }>, w: 
   }
   return out;
 }
+
+/**
+ * ClawPump's auto-buyback runs through the token's own ClawPump wallet. A buy is $TOKENL arriving in that
+ * wallet in the same transaction as SOL leaving it; a burn is $TOKENL leaving it to nowhere. Plain
+ * transfers in (airdrops, gifts) are ignored.
+ */
+export function classifyAutoBuyback(tx: ChainTx, wallet: string, mint: string, since = 0): Classified[] {
+  // Only after auto-buyback was switched on: earlier activity (such as the launch purchase) is not a buyback.
+  if (!wallet || !mint || tx.timestamp * 1000 < since) return [];
+  const out: Classified[] = [];
+  const transfers = (tx.tokenTransfers ?? []).filter((t) => t.mint === mint && t.tokenAmount > 0);
+  const bought = transfers.filter((t) => t.toUserAccount === wallet && t.fromUserAccount !== wallet).reduce((s, t) => s + t.tokenAmount, 0);
+  const paidSol = (tx.nativeTransfers ?? []).some((t) => t.fromUserAccount === wallet && t.amount > 0)
+    || (tx.tokenTransfers ?? []).some((t) => t.fromUserAccount === wallet && t.mint === WSOL && t.tokenAmount > 0);
+  if (bought > 0 && paidSol) out.push({ type: 'buyback', agentId: null, asset: mint, amount: bought, from: 'clawpump', to: wallet });
+  const burned = transfers.filter((t) => t.fromUserAccount === wallet && !t.toUserAccount).reduce((s, t) => s + t.tokenAmount, 0);
+  if (burned > 0) out.push({ type: 'burn', agentId: null, asset: mint, amount: burned, from: wallet, to: 'burn' });
+  return out;
+}
+
+const WSOL = 'So11111111111111111111111111111111111111112';

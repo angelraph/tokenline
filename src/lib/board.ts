@@ -77,7 +77,9 @@ export async function poolStats() {
   let drawnUsd = 0, upstreamUsd = 0, repaidUsd = 0, depositsUsd = 0, draws = 0, tokensServed = 0, salesUsd = 0, reportsSold = 0;
   let buybackUsd = 0;
   const bought: Record<string, number> = {};
-  const buybacks: { signature: string; asset: string; amount: number; usd: number; at: string }[] = [];
+  const buybacks: { signature: string; asset: string; amount: number; usd: number; at: string; source: 'pool' | 'clawpump'; burned: boolean }[] = [];
+  const burnedSigs = new Set(events.filter((e) => e.type === 'burn').map((e) => String(e.meta?.signature ?? '')));
+  let burnedAmount = 0;
   for (const e of events) {
     if (e.type === 'draw') {
       drawnUsd += e.amountUsd; draws++;
@@ -87,10 +89,12 @@ export async function poolStats() {
     if (e.type === 'repay') repaidUsd += e.amountUsd;
     if (e.type === 'deposit') depositsUsd += e.amountUsd;
     if (e.type === 'sale') { salesUsd += e.amountUsd; reportsSold++; }
+    if (e.type === 'burn') burnedAmount += Number(e.amount ?? 0);
     if (e.type === 'buyback' && e.asset) {
       buybackUsd += e.amountUsd;
       bought[e.asset] = (bought[e.asset] ?? 0) + Number(e.amount ?? 0);
-      buybacks.push({ signature: String(e.meta?.signature ?? ''), asset: e.asset, amount: Number(e.amount ?? 0), usd: e.amountUsd, at: e.at });
+      const signature = String(e.meta?.signature ?? '');
+      buybacks.push({ signature, asset: e.asset, amount: Number(e.amount ?? 0), usd: e.amountUsd, at: e.at, source: e.meta?.from === 'clawpump' ? 'clawpump' : 'pool', burned: burnedSigs.has(signature) });
     }
   }
   let overdueUsd = 0, outstandingUsd = 0;
@@ -118,6 +122,7 @@ export async function poolStats() {
     buybackTargetUsd: r2((drawnUsd - upstreamUsd + salesUsd) * config.policy.buybackShare),
     buybackUsd: r2(buybackUsd),
     buybackCount: new Set(buybacks.map((b) => b.signature)).size,
+    burnedAmount,
     bought,
     buybacks: buybacks.sort((a, b) => b.at.localeCompare(a.at)).slice(0, 20),
     overdueUsd: r2(overdueUsd),

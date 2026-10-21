@@ -1,5 +1,11 @@
 const num = (v: string | undefined, d: number) => (v && !Number.isNaN(Number(v)) ? Number(v) : d);
 
+/** Reads a percent written as 25, 25% or " 25 "; anything else, or outside 1 to 100, means unset. */
+const pct = (v: string | undefined) => {
+  const n = parseFloat(String(v ?? '').replace('%', '').trim());
+  return Number.isFinite(n) && n > 0 && n <= 100 ? n : null;
+};
+
 export const config = {
   baseUrl: process.env.PUBLIC_BASE_URL ?? 'http://localhost:3000',
   databaseUrl: process.env.DATABASE_URL || '',
@@ -29,7 +35,7 @@ export const config = {
     /** Share of desk revenue (spread + report sales) committed to buying back $TOKENL / $ANSEM. */
     buybackShare: num(process.env.BUYBACK_SHARE, 0.5),
     /** Public rule: this percent of each creator-fee withdrawal buys $TOKENL. Unset until the creator commits to one. */
-    creatorBuybackPct: Number(process.env.CREATOR_BUYBACK_PCT) > 0 ? Number(process.env.CREATOR_BUYBACK_PCT) : null,
+    creatorBuybackPct: pct(process.env.CREATOR_BUYBACK_PCT),
     // Days of silence (no fee collections) before an unsecured line is frozen.
     staleDays: 7,
     // Outstanding debt older than this with no repayment marks the agent overdue.
@@ -39,6 +45,10 @@ export const config = {
   /** X API user keys for @tokenlinehq (OAuth 1.0a, read and write). Only the Credit Watch bot uses them. */
   /** Post the daily Credit Watch thread through the X API (needs paid X credits). Otherwise it is saved as a draft for the operator. */
   xAutopost: process.env.X_AUTOPOST === '1',
+  /** The token's ClawPump wallet, which runs ClawPump's auto-buyback from creator fees. */
+  autoBuybackWallet: (process.env.AUTO_BUYBACK_WALLET || 'Pt2XMXdFesf3Wb5VafNVikvSQDGtsN1kdhRgWJ7MUF6').trim(),
+  /** When auto-buyback was switched on; nothing before this counts as a buyback. */
+  autoBuybackSince: Date.parse(process.env.AUTO_BUYBACK_SINCE || '2026-10-21T07:00:00Z'),
   /** Telegram bot (free API). The channel gets the daily digest; the bot answers /score and friends. */
   telegram: {
     token: (process.env.TELEGRAM_BOT_TOKEN || '').trim(),

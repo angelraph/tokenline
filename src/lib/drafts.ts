@@ -41,7 +41,7 @@ export async function dailyDrafts(rows: BoardRow[], moves: Move[], base: string,
   const pct = config.policy.creatorBuybackPct;
   const last = pool.buybacks[0];
   const receipt = last && last.signature && now - Date.parse(last.at) < 36 * 3_600_000
-    ? buybackReceipt({ amount: last.amount, usd: last.usd, signature: last.signature, isTokenl: last.asset === config.mints.tline }, pct)
+    ? buybackReceipt({ amount: last.amount, usd: last.usd, signature: last.signature, isTokenl: last.asset === config.mints.tline, source: last.source, burned: last.burned }, pct)
     : null;
   const announcement = pct ? buybackAnnouncement(pct, base) : null;
 

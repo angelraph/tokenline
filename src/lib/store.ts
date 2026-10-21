@@ -19,7 +19,7 @@ export type Agent = {
 
 export type EventType =
   | 'apply' | 'verify' | 'draw' | 'repay' | 'collateral' | 'collateral_release'
-  | 'deposit' | 'withdraw' | 'freeze' | 'unfreeze' | 'buyback' | 'sale';
+  | 'deposit' | 'withdraw' | 'freeze' | 'unfreeze' | 'buyback' | 'burn' | 'sale';
 
 export type LedgerEvent = {
   id: string;
