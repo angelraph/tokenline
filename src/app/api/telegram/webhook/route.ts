@@ -4,6 +4,8 @@ import { config } from '@/lib/config';
 import { sendText, telegramConfigured, webhookSecret } from '@/lib/telegram';
 import { findAgent, helpMessage, ledgerMessage, scoreMessage, tokenMessage, topMessage, watchMessage } from '@/lib/tgformat';
 import { movers } from '@/lib/watch';
+import { holderMin, saveSubscribers, subscribers } from '@/lib/alerts';
+import { makeLinkCode } from '@/lib/alertscore';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
@@ -17,6 +19,19 @@ async function answer(chatId: number, text: string) {
 
   if (command === '/start' || command === '/help') return sendText(chatId, helpMessage(base()));
   if (command === '/token') return sendText(chatId, tokenMessage(config.mints.tline, base()));
+  if (command === '/alerts') {
+    const sub = (await subscribers())[String(chatId)];
+    if (sub) return sendText(chatId, `Holder alerts are on for ${sub.wallet.slice(0, 4)}...${sub.wallet.slice(-4)}. Send /stop to turn them off.`);
+    const link = `${base()}/alerts?c=${makeLinkCode(chatId, config.quoteSecret, Date.now())}`;
+    return sendText(chatId, `<b>Holder alerts</b>\n\nWallets holding ${holderMin().toLocaleString('en-US')}+ $TOKENL get upgrades, downgrades, new credit lines and volume spikes the moment they happen.\n\nOpen this link and sign one message with your wallet (free, moves no funds). It is valid for 30 minutes:\n${link}`);
+  }
+  if (command === '/stop') {
+    const subs = await subscribers();
+    if (!subs[String(chatId)]) return sendText(chatId, 'Holder alerts are not on for this chat. Send /alerts to turn them on.');
+    delete subs[String(chatId)];
+    await saveSubscribers(subs);
+    return sendText(chatId, 'Holder alerts are off. Send /alerts any time to turn them back on.');
+  }
   if (command === '/ledger') return sendText(chatId, ledgerMessage(await poolStats(), base()));
 
   const { rows } = await board();

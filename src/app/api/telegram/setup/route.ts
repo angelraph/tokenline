@@ -10,6 +10,8 @@ const COMMANDS = [
   { command: 'watch', description: 'Upgrades and downgrades today' },
   { command: 'ledger', description: 'Draws, repayments and buybacks' },
   { command: 'token', description: '$TOKENL contract and links' },
+  { command: 'alerts', description: 'Live alerts for $TOKENL holders' },
+  { command: 'stop', description: 'Turn holder alerts off' },
   { command: 'help', description: 'What Tokenline does' },
 ];
 

@@ -94,6 +94,7 @@ export function helpMessage(base: string) {
     '/watch · upgrades and downgrades today',
     '/ledger · draws, repayments and buybacks',
     '/token · $TOKENL contract and links',
+    '/alerts · live alerts for $TOKENL holders',
     '',
     `Open a credit line: ${base}/apply`,
   ].join('\n');

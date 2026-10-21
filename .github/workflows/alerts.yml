@@ -1,0 +1,16 @@
+name: Holder alerts
+
+# Vercel's free plan only runs scheduled jobs daily, so this checks the board every 30 minutes
+# and sends Telegram alerts to $TOKENL holders when something changes.
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+jobs:
+  alerts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Run holder alerts
+        run: curl -fsS -m 90 -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" https://tokenline.vercel.app/api/alerts/run
