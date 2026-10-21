@@ -105,5 +105,5 @@ export function buybackReceipt(b: BuybackData, creatorPct: number | null): strin
 
 /** The one-off post that states the creator-fee buyback rule. Only shown once the rule is set. */
 export function buybackAnnouncement(creatorPct: number, base: string): string {
-  return `New rule for $TOKENL: ${creatorPct}% of every creator fee withdrawal buys $TOKENL on the open market.\n\nEvery buyback is signed by the Tokenline pool wallet and lands on the public ledger with its transaction.\n\nReceipts:\n${base}/ledger`;
+  return `New rule for $TOKENL: ${creatorPct}% of every creator fee withdrawal buys $TOKENL on the open market.\n\nEvery buyback happens on-chain and lands on the public ledger with its transaction.\n\nReceipts:\n${base}/ledger`;
 }
