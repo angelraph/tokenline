@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 
-type Drafts = { morning: string; midday: string; evening: string };
+type Drafts = { morning: string; midday: string; evening: string; receipt: string | null; announcement: string | null };
 type Preview = { drafts: Drafts; posts: string[]; moves: number; since: string | null };
 
 const SLOTS: { key: keyof Drafts; label: string }[] = [
+  { key: 'receipt', label: 'Buyback receipt: a buyback just landed, post this today' },
+  { key: 'announcement', label: 'Buyback rule: post once and pin it' },
   { key: 'morning', label: 'Morning: product' },
   { key: 'midday', label: 'Midday: live data' },
   { key: 'evening', label: 'Evening: build log or receipts' },
@@ -49,13 +51,13 @@ export function BotDraft({ headers }: { headers: () => Record<string, string> })
       {err && <div className="callout warn" style={{ marginTop: 12 }}>{err}</div>}
       {data?.drafts && (
         <div style={{ display: 'grid', gap: 12, marginTop: 14 }}>
-          {SLOTS.map((slot, n) => (
+          {SLOTS.filter((slot) => data.drafts[slot.key]).map((slot, n) => (
             <div className="card" key={slot.key}>
-              <div className="sub" style={{ marginBottom: 8 }}>{slot.label} · new every day, live numbers</div>
-              <div style={{ whiteSpace: 'pre-wrap', fontSize: 14, lineHeight: 1.55, overflowWrap: 'anywhere' }}>{data.drafts[slot.key]}</div>
+              <div className="sub" style={{ marginBottom: 8 }}>{slot.label}</div>
+              <div style={{ whiteSpace: 'pre-wrap', fontSize: 14, lineHeight: 1.55, overflowWrap: 'anywhere' }}>{data.drafts[slot.key] ?? ''}</div>
               <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
-                <button className="btn sm" onClick={() => copy(-1 - n, data.drafts[slot.key])}>{copied === -1 - n ? 'Copied' : 'Copy'}</button>
-                <a className="btn primary sm" href={intent(data.drafts[slot.key])} target="_blank" rel="noreferrer">Open in X</a>
+                <button className="btn sm" onClick={() => copy(-1 - n, data.drafts[slot.key] ?? '')}>{copied === -1 - n ? 'Copied' : 'Copy'}</button>
+                <a className="btn primary sm" href={intent(data.drafts[slot.key] ?? '')} target="_blank" rel="noreferrer">Open in X</a>
               </div>
             </div>
           ))}

@@ -2,7 +2,7 @@ import type { BoardRow } from './board';
 import { poolStats } from './board';
 import { recentShip } from './changelog';
 import { config } from './config';
-import { dailyProductPost, eveningPost, middayInsightPost } from './dailypost';
+import { buybackAnnouncement, buybackReceipt, dailyProductPost, eveningPost, middayInsightPost } from './dailypost';
 import type { Move } from './watch';
 
 /** Today's three posts (morning product, midday live data, evening build log or receipts) from live numbers. */
@@ -38,5 +38,12 @@ export async function dailyDrafts(rows: BoardRow[], moves: Move[], base: string,
     reportsSold: pool.reportsSold, buybacks: pool.buybackCount, buybackUsd: pool.buybackUsd,
   }, day);
 
-  return { morning, midday, evening };
+  const pct = config.policy.creatorBuybackPct;
+  const last = pool.buybacks[0];
+  const receipt = last && last.signature && now - Date.parse(last.at) < 36 * 3_600_000
+    ? buybackReceipt({ amount: last.amount, usd: last.usd, signature: last.signature, isTokenl: last.asset === config.mints.tline }, pct)
+    : null;
+  const announcement = pct ? buybackAnnouncement(pct, base) : null;
+
+  return { morning, midday, evening, receipt, announcement };
 }

@@ -28,6 +28,8 @@ export const config = {
     holderMin: num(process.env.TLINE_HOLDER_MIN, 100_000),
     /** Share of desk revenue (spread + report sales) committed to buying back $TOKENL / $ANSEM. */
     buybackShare: num(process.env.BUYBACK_SHARE, 0.5),
+    /** Public rule: this percent of each creator-fee withdrawal buys $TOKENL. Unset until the creator commits to one. */
+    creatorBuybackPct: Number(process.env.CREATOR_BUYBACK_PCT) > 0 ? Number(process.env.CREATOR_BUYBACK_PCT) : null,
     // Days of silence (no fee collections) before an unsecured line is frozen.
     staleDays: 7,
     // Outstanding debt older than this with no repayment marks the agent overdue.

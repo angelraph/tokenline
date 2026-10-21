@@ -92,3 +92,18 @@ export function eveningPost(d: EveningData, day: number): string {
   }
   return pick(RECEIPTS, day)(d);
 }
+
+export type BuybackData = { amount: number; usd: number; signature: string; isTokenl: boolean };
+
+/** Receipt for a buyback the pool wallet just signed. Real amounts and the transaction only. */
+export function buybackReceipt(b: BuybackData, creatorPct: number | null): string {
+  const qty = Math.round(b.amount).toLocaleString('en-US');
+  const what = b.isTokenl ? '$TOKENL' : '$ANSEM';
+  const rule = creatorPct ? `\n\nThat is part of the ${creatorPct}% of creator fees we put back into ${what}, as promised.` : '';
+  return `Buyback done: ${qty} ${what} (${b.usd < 100 ? '$' + b.usd.toFixed(2) : usd(b.usd)}) bought on the open market, signed by the Tokenline pool wallet.${rule}\n\nOn-chain:\nhttps://solscan.io/tx/${b.signature}`;
+}
+
+/** The one-off post that states the creator-fee buyback rule. Only shown once the rule is set. */
+export function buybackAnnouncement(creatorPct: number, base: string): string {
+  return `New rule for $TOKENL: ${creatorPct}% of every creator fee withdrawal buys $TOKENL on the open market.\n\nEvery buyback is signed by the Tokenline pool wallet and lands on the public ledger with its transaction.\n\nReceipts:\n${base}/ledger`;
+}
