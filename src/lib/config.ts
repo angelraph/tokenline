@@ -45,8 +45,12 @@ export const config = {
   /** X API user keys for @tokenlinehq (OAuth 1.0a, read and write). Only the Credit Watch bot uses them. */
   /** Post the daily Credit Watch thread through the X API (needs paid X credits). Otherwise it is saved as a draft for the operator. */
   xAutopost: process.env.X_AUTOPOST === '1',
-  /** The token's ClawPump wallet, which runs ClawPump's auto-buyback from creator fees. */
-  autoBuybackWallet: (process.env.AUTO_BUYBACK_WALLET || 'Pt2XMXdFesf3Wb5VafNVikvSQDGtsN1kdhRgWJ7MUF6').trim(),
+  /**
+   * Wallets ClawPump uses for this token. Its auto-buyback is signed by the agent wallet that launched the token
+   * (5eFD...), and the token page lists Pt2X... as the creator wallet; both are watched.
+   */
+  autoBuybackWallets: (process.env.AUTO_BUYBACK_WALLETS || '5eFDKmeuqefBMsUNfTd6ez1SE53VGdksGadXfw5yEyM3,Pt2XMXdFesf3Wb5VafNVikvSQDGtsN1kdhRgWJ7MUF6')
+    .split(',').map((s) => s.trim()).filter(Boolean),
   /** When auto-buyback was switched on; nothing before this counts as a buyback. */
   autoBuybackSince: Date.parse(process.env.AUTO_BUYBACK_SINCE || '2026-10-21T07:00:00Z'),
   /** Telegram bot (free API). The channel gets the daily digest; the bot answers /score and friends. */
