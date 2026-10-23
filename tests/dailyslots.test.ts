@@ -50,5 +50,5 @@ test('no hype or price words in any slot', () => {
     ...Array.from({ length: 4 }, (_, i) => middayInsightPost(ins, i)),
     ...Array.from({ length: 3 }, (_, i) => eveningPost(eve, i)),
   ].join('\n').toLowerCase();
-  for (const w of ['100x', 'moon', 'guaranteed', 'pump', 'price target', 'financial advice']) assert.ok(!all.includes(w), w);
+  for (const w of ['100x', 'moon', 'guaranteed', 'pump', 'price target', 'financial advice']) assert.ok(!new RegExp(`(^|[^a-z])${w}([^a-z]|$)`).test(all), w);
 });

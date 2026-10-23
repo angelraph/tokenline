@@ -4,6 +4,7 @@ import { recentShip } from './changelog';
 import { config } from './config';
 import { buybackAnnouncement, buybackReceipt, dailyProductPost, eveningPost, middayInsightPost } from './dailypost';
 import type { Move } from './watch';
+import { store } from './store';
 
 /** Today's three posts (morning product, midday live data, evening build log or receipts) from live numbers. */
 export async function dailyDrafts(rows: BoardRow[], moves: Move[], base: string, now = Date.now()) {
@@ -12,7 +13,8 @@ export async function dailyDrafts(rows: BoardRow[], moves: Move[], base: string,
   const handle = new Map(rows.map((r) => [r.mint, r.xHandle]));
   const top = rows[0];
   const busiest = [...rows].sort((a, b) => b.volume24hUsd - a.volume24hUsd)[0];
-  const upgrade = moves.filter((m) => m.kind === 'upgrade').sort((a, b) => b.delta - a.delta)[0];
+  // Only upgrades worth celebrating: the agent lands at grade A or better.
+  const upgrade = moves.filter((m) => m.kind === 'upgrade' && m.to >= 600).sort((a, b) => b.delta - a.delta)[0];
   const approved = rows.filter((r) => r.lineUsd > 0).length;
 
   const morning = dailyProductPost({
@@ -46,4 +48,19 @@ export async function dailyDrafts(rows: BoardRow[], moves: Move[], base: string,
   const announcement = pct ? buybackAnnouncement(pct, base) : null;
 
   return { morning, midday, evening, receipt, announcement };
+}
+
+export type DayPosts = { date: string; savedAt: string; posts: Record<string, string> };
+const ARCHIVE = 'posts:archive';
+const KEEP_DAYS = 14;
+
+/** Saves today's posts (overwriting earlier versions from today) and returns the archive, newest first. */
+export async function saveDay(drafts: Record<string, string | null>, now = Date.now()): Promise<DayPosts[]> {
+  const date = new Date(now).toISOString().slice(0, 10);
+  const posts = Object.fromEntries(Object.entries(drafts).filter((e): e is [string, string] => !!e[1]));
+  const all = (await store.getKv<Record<string, DayPosts>>(ARCHIVE)) ?? {};
+  all[date] = { date, savedAt: new Date(now).toISOString(), posts };
+  const kept = Object.fromEntries(Object.entries(all).sort(([a], [b]) => b.localeCompare(a)).slice(0, KEEP_DAYS));
+  await store.setKv(ARCHIVE, kept);
+  return Object.values(kept);
 }

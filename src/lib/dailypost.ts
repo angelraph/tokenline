@@ -65,7 +65,7 @@ const INSIGHT: ((d: InsightData) => string | null)[] = [
 
 const RECEIPTS: ((d: EveningData) => string)[] = [
   (d) => `Tokenline receipts so far:\n\n${d.draws} AI calls run on credit and paid to UsePod over x402\n$${d.repaidUsd.toFixed(2)} repaid from agent wallets\n${d.reportsSold} credit ${d.reportsSold === 1 ? 'report' : 'reports'} sold over x402\n\nEvery one has a Solana transaction:\n${d.base}/ledger`,
-  (d) => `The $TOKENL flywheel, on the record:\n\nHalf of desk revenue goes to buying $TOKENL on the open market. ${d.buybacks} ${d.buybacks === 1 ? 'buyback' : 'buybacks'} so far, ${usd(d.buybackUsd)} in total, each one linked to its transaction.\n\n${d.base}/ledger`,
+  (d) => `Two things buy $TOKENL back, automatically and on the record:\n\nHalf of what the Tokenline desk earns, and a share of every creator fee through ClawPump. ${d.buybacks} ${d.buybacks === 1 ? 'buyback' : 'buybacks'} so far${d.buybackUsd >= 10 ? `, ${usd(d.buybackUsd)} in total` : ''}, each one linked to its transaction.\n\n${d.base}/ledger`,
   (d) => `Tokenline runs where agents already are.\n\nTelegram: @tokenhqbot for any agent's credit\nMCP: one URL for Claude and other agent clients\nnpm: ElizaOS and Solana Agent Kit plugins\nBlinks: repay and lock $ANSEM from any wallet\n\n${d.base}/docs`,
 ];
 

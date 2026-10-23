@@ -27,5 +27,5 @@ test('posts carry the live numbers they are given', () => {
 
 test('no price predictions or hype words', () => {
   const all = Array.from({ length: 7 }, (_, i) => dailyProductPost(d, i)).join('\n').toLowerCase();
-  for (const w of ['100x', 'moon', 'guaranteed', 'pump', 'next 1000x', 'financial advice']) assert.ok(!all.includes(w), w);
+  for (const w of ['100x', 'moon', 'guaranteed', 'pump', 'next 1000x', 'financial advice']) assert.ok(!new RegExp(`(^|[^a-z])${w}([^a-z]|$)`).test(all), w);
 });

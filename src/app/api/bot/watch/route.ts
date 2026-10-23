@@ -1,5 +1,5 @@
 import { board } from '@/lib/board';
-import { dailyDrafts } from '@/lib/drafts';
+import { dailyDrafts, saveDay } from '@/lib/drafts';
 import { config } from '@/lib/config';
 import { fail, isCron, ok } from '@/lib/http';
 import { store } from '@/lib/store';
@@ -39,10 +39,11 @@ async function run(req: Request) {
   const base = config.baseUrl.replace(/\/$/, '');
   const drafts = await dailyDrafts(rows, moves, base);
   const product = drafts.morning;
+  const archive = await saveDay(drafts);
   const posts = since ? composeDigest(moves.map((m) => ({ ...m, xHandle: handles.get(m.mint) ?? null })), since, Date.now(), base) : [];
 
   const last = await store.getKv<Last>(LAST);
-  if (preview) return ok({ product, drafts, posts, moves: moves.length, since: since ? new Date(since).toISOString() : null, autopost: config.xAutopost, configured: xConfigured(), last, lastError: await store.getKv(ERR), draft: await store.getKv(DRAFT) });
+  if (preview) return ok({ product, drafts, archive, posts, moves: moves.length, since: since ? new Date(since).toISOString() : null, autopost: config.xAutopost, configured: xConfigured(), last, lastError: await store.getKv(ERR), draft: await store.getKv(DRAFT) });
   // Telegram channel: one post a day, the digest on good days and a board snapshot otherwise.
   let telegram: unknown = 'not configured';
   if (telegramConfigured() && config.telegram.channel) {
