@@ -16,11 +16,12 @@ export async function dailyDrafts(rows: BoardRow[], moves: Move[], base: string,
   // Only upgrades worth celebrating: the agent lands at grade A or better.
   const upgrade = moves.filter((m) => m.kind === 'upgrade' && m.to >= 600).sort((a, b) => b.delta - a.delta)[0];
   const approved = rows.filter((r) => r.lineUsd > 0).length;
+  const top3 = rows.slice(0, 3).map((r) => ({ project: r.project, grade: r.grade, score: r.score }));
 
   const morning = dailyProductPost({
     base, agents: rows.length, approved, trading: rows.filter((r) => r.volume24hUsd >= 50).length,
     top: top ? { project: top.project, xHandle: top.xHandle, grade: top.grade, score: top.score, monthlyCreatorUsd: top.monthlyCreatorUsd, mint: top.mint } : null,
-    draws: pool.draws, buybacks: pool.buybackCount, tokenMint: config.mints.tline,
+    draws: pool.draws, buybacks: pool.buybackCount, tokenMint: config.mints.tline, top3,
   }, day);
 
   const midday = middayInsightPost({
@@ -32,6 +33,7 @@ export async function dailyDrafts(rows: BoardRow[], moves: Move[], base: string,
     busiest: busiest && busiest.volume24hUsd > 0
       ? { project: busiest.project, xHandle: busiest.xHandle, grade: busiest.grade, vol24: busiest.volume24hUsd, mint: busiest.mint }
       : null,
+    top3,
     upgrade: upgrade ? { project: upgrade.project, xHandle: handle.get(upgrade.mint) ?? null, from: upgrade.from, to: upgrade.to, grade: upgrade.gradeTo, mint: upgrade.mint } : null,
   }, day);
 
