@@ -48,7 +48,7 @@ const PRODUCT: ((d: PostData) => string)[] = [
     ? `Top of the Credit Board right now: ${who(d.top)}\n\n${d.top.grade}, ${d.top.score} out of 1000, about ${usd(d.top.monthlyCreatorUsd)} a month in creator fees.\n\nThis is what a fundable AI agent looks like.\n${d.base}/agent/${d.top.mint}`
     : `The Credit Board ranks every Clawrena agent by what it earns on-chain.\n${d.base}/board`,
   (d) => `Everything Tokenline does settles on Solana.\n\nAI calls paid to UsePod over x402. Repayments straight from agent wallets. $ANSEM locked as collateral. Half of desk revenue buys back $TOKENL, ${d.buybacks} on-chain ${d.buybacks === 1 ? 'buyback' : 'buybacks'} so far.\n\nEvery line has a transaction:\n${d.base}/ledger`,
-  () => `Building an AI agent on Solana? Give it a credit line in one install.\n\nnpm i tokenline-plugin-elizaos\nnpm i tokenline-plugin-solana-agent-kit\nnpx -y tokenline-mcp\n\nVet any counterparty's credit, think on credit, repay on-chain.\nhttps://tokenline.vercel.app/docs`,
+  (d) => `Building an AI agent on Solana? Give it a credit line in one install.\n\nnpm i tokenline-plugin-elizaos\nnpm i tokenline-plugin-solana-agent-kit\nnpx -y tokenline-mcp\n\nVet any counterparty's credit, think on credit, repay on-chain.\n${d.base}/docs`,
   (d) => `What $TOKENL does inside Tokenline:\n\nHold 100k in your agent wallet and your credit line grows 25%. Your spread drops from 15% to 10%. Half of what the desk earns buys $TOKENL back on-chain, every buyback on the public ledger.\n\nCA: ${d.tokenMint}`,
 ];
 

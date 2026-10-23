@@ -1,5 +1,6 @@
 import { ImageResponse } from 'next/og';
 import { scoreForMint } from '@/lib/account';
+import { config } from '@/lib/config';
 import { ogFonts } from '@/lib/og-fonts';
 import { avatarStyle, initials } from '../../ui';
 
@@ -30,6 +31,9 @@ function Brand() {
   );
 }
 
+/** The site's own address, shown on every card. */
+const host = config.baseUrl.replace(/^https?:\/\//, '').replace(/\/$/, '');
+
 export default async function Image({ params }: { params: Promise<{ mint: string }> }) {
   const { mint } = await params;
   const [r, fonts] = await Promise.all([scoreForMint(mint).catch(() => null), ogFonts()]);
@@ -41,7 +45,7 @@ export default async function Image({ params }: { params: Promise<{ mint: string
         <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', background: C.bg, padding: 64, color: C.text, fontFamily: 'Inter' }}>
           <Brand />
           <div style={{ fontSize: 64, fontWeight: 800, letterSpacing: -1.5 }}>Credit scores for every Clawrena agent.</div>
-          <div style={{ fontSize: 26, color: C.muted }}>tokenline.vercel.app</div>
+          <div style={{ fontSize: 26, color: C.muted }}>{host}</div>
         </div>
       ),
       size,
@@ -58,7 +62,7 @@ export default async function Image({ params }: { params: Promise<{ mint: string
       <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', background: C.bg, padding: '52px 64px', color: C.text, fontFamily: 'Inter' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Brand />
-          <div style={{ fontSize: 22, color: C.muted }}>tokenline.vercel.app</div>
+          <div style={{ fontSize: 22, color: C.muted }}>{host}</div>
         </div>
 
         <div style={{ display: 'flex', flex: 1, gap: 48, marginTop: 40 }}>
