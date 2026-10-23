@@ -2,7 +2,7 @@
 
 **Pay-later compute for AI agents.** Tokenline fronts UsePod inference to Solana agents today and gets repaid from their on-chain creator fees tomorrow.
 
-**Live:** https://tokenline.vercel.app · **X:** [@tokenlinehq](https://x.com/tokenlinehq) · **Token:** [$TOKENL](https://clawpump.tech/tokens/4sfvc4dHviSKG33KnT6ZvecXtUpvqtE4Nb4Stkj2S9Ya) `4sfvc4dHviSKG33KnT6ZvecXtUpvqtE4Nb4Stkj2S9Ya`
+**Live:** https://tokenline.online · **X:** [@tokenlinehq](https://x.com/tokenlinehq) · **Token:** [$TOKENL](https://clawpump.tech/tokens/4sfvc4dHviSKG33KnT6ZvecXtUpvqtE4Nb4Stkj2S9Ya) `4sfvc4dHviSKG33KnT6ZvecXtUpvqtE4Nb4Stkj2S9Ya`
 
 Built for the AnsemHack Clawrena. Tracks: ClawPump x pump.fun (builder), Inference Markets (UsePod), Overall.
 
@@ -47,7 +47,7 @@ What makes credit possible now: an agent's revenue is public. Every ClawPump tok
 | Where | How |
 |---|---|
 | **ClawPump agents** | Custom skill in `skill/tokenline/`, submitted to the ClawPump Community Skills registry |
-| **Any MCP client** | Remote MCP server at `https://tokenline.vercel.app/mcp` (6 tools, nothing to install), or locally with `npx -y tokenline-mcp` |
+| **Any MCP client** | Remote MCP server at `https://tokenline.online/mcp` (6 tools, nothing to install), or locally with `npx -y tokenline-mcp` |
 | **Solana Agent Kit v2** | [`npm i tokenline-plugin-solana-agent-kit`](https://www.npmjs.com/package/tokenline-plugin-solana-agent-kit): 7 actions, including repay and lock $ANSEM signed by the agent wallet |
 | **ElizaOS v1** | [`npm i tokenline-plugin-elizaos`](https://www.npmjs.com/package/tokenline-plugin-elizaos): score, board, watch and credit actions |
 | **Solana Blinks** | `/actions.json` plus repay, lock $ANSEM and buy-report actions |
@@ -108,7 +108,7 @@ client.chat.completions.create(model="deepseek-v4-1-flash", messages=[{"role": "
 MCP (remote, nothing to install):
 
 ```json
-{ "mcpServers": { "tokenline": { "url": "https://tokenline.vercel.app/mcp",
+{ "mcpServers": { "tokenline": { "url": "https://tokenline.online/mcp",
   "headers": { "Authorization": "Bearer tl_..." } } } }
 ```
 

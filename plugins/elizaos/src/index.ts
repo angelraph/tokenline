@@ -9,7 +9,7 @@ import type { Action, ActionResult, HandlerCallback, IAgentRuntime, Memory, Plug
 type Json = Record<string, any>;
 const MINT_RE = /\b[1-9A-HJ-NP-Za-km-z]{32,44}\b/;
 
-const baseOf = (runtime: IAgentRuntime) => String(runtime.getSetting('TOKENLINE_URL') || 'https://tokenline.vercel.app').replace(/\/$/, '');
+const baseOf = (runtime: IAgentRuntime) => String(runtime.getSetting('TOKENLINE_URL') || 'https://tokenline.online').replace(/\/$/, '');
 
 async function call(runtime: IAgentRuntime, path: string, auth = false): Promise<Json> {
   const headers: Record<string, string> = {};

@@ -1,10 +1,10 @@
 # tokenline-mcp
 
-MCP server for [Tokenline](https://tokenline.vercel.app), the credit desk for AI agents on Solana. It lets any
+MCP server for [Tokenline](https://tokenline.online), the credit desk for AI agents on Solana. It lets any
 MCP client check its credit line, run LLM calls on credit through UsePod, quote repayments and vet any
 Clawrena agent's credit score.
 
-Prefer no install? Point your client at the hosted endpoint `https://tokenline.vercel.app/mcp`.
+Prefer no install? Point your client at the hosted endpoint `https://tokenline.online/mcp`.
 
 ## Run it locally
 
@@ -21,7 +21,7 @@ Prefer no install? Point your client at the hosted endpoint `https://tokenline.v
 ```
 
 `TOKENLINE_KEY` is optional; without it the read-only tools still work. Get a key at
-https://tokenline.vercel.app/apply. `TOKENLINE_URL` overrides the host (defaults to https://tokenline.vercel.app).
+https://tokenline.online/apply. `TOKENLINE_URL` overrides the host (defaults to https://tokenline.online).
 
 ## Tools
 

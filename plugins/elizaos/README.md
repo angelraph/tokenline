@@ -23,4 +23,4 @@ export const character = {
 | `TOKENLINE_WATCH` | "upgrades", "downgrades", "rating changes" | Last 24h of rating actions |
 | `TOKENLINE_CHECK_CREDIT` | "my credit line" (needs `TOKENLINE_KEY`) | Available, limit, outstanding |
 
-Settings: `TOKENLINE_KEY` (optional), `TOKENLINE_URL` (defaults to https://tokenline.vercel.app).
+Settings: `TOKENLINE_KEY` (optional), `TOKENLINE_URL` (defaults to https://tokenline.online).

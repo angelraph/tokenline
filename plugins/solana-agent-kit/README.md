@@ -31,4 +31,4 @@ Actions work with `createLangchainTools`, `createOpenAITools` and `createSolanaT
 Repay and collateral transactions are built by Tokenline's public Solana Actions endpoints and signed locally;
 the wallet key never leaves the agent.
 
-Open a line: https://tokenline.vercel.app/apply
+Open a line: https://tokenline.online/apply

@@ -3,14 +3,16 @@ import { NextResponse, type NextRequest } from 'next/server';
 // Visitors on the old tokenline.vercel.app address are sent to the main domain set in PUBLIC_BASE_URL.
 // Only pages move: anything an agent, wallet or service calls keeps answering on both addresses.
 
-const OLD_HOST = 'tokenline.vercel.app';
+// The old Vercel address and the www form both forward to the main domain.
+const OLD_HOSTS = ['tokenline.vercel.app', 'www.tokenline.online'];
 
 export function middleware(req: NextRequest) {
   const main = process.env.PUBLIC_BASE_URL;
-  if (!main || req.headers.get('host') !== OLD_HOST) return NextResponse.next();
+  const host = req.headers.get('host') ?? '';
+  if (!main || !OLD_HOSTS.includes(host)) return NextResponse.next();
   let target: URL;
   try { target = new URL(main); } catch { return NextResponse.next(); }
-  if (target.host === OLD_HOST) return NextResponse.next();
+  if (target.host === host) return NextResponse.next();
   const url = req.nextUrl.clone();
   url.protocol = target.protocol;
   url.host = target.host;

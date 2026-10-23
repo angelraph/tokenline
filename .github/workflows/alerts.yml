@@ -13,4 +13,4 @@ jobs:
     timeout-minutes: 3
     steps:
       - name: Run holder alerts
-        run: curl -fsS -m 90 -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" https://tokenline.vercel.app/api/alerts/run
+        run: curl -fsS -m 90 -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" https://tokenline.online/api/alerts/run

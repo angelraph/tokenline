@@ -13,7 +13,7 @@ export type TokenlineOptions = { apiKey?: string; baseUrl?: string };
 type Json = Record<string, any>;
 
 function client(opts: TokenlineOptions) {
-  const base = (opts.baseUrl ?? 'https://tokenline.vercel.app').replace(/\/$/, '');
+  const base = (opts.baseUrl ?? 'https://tokenline.online').replace(/\/$/, '');
   const call = async (path: string, init: RequestInit = {}, auth = false): Promise<Json> => {
     const headers: Record<string, string> = { 'content-type': 'application/json', ...(init.headers as Record<string, string>) };
     if (auth) {

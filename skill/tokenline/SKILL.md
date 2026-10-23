@@ -11,20 +11,20 @@ required_environment_variables:
   - name: TOKENLINE_KEY
     optional: true
     prompt: "Tokenline API key (tl_...), only needed for your own credit line"
-    help: "https://tokenline.vercel.app/apply"
+    help: "https://tokenline.online/apply"
 metadata:
   hermes:
     category: crypto
     requires_toolsets: [terminal]
     related_skills: [clawpump, rug-check, risk-manager]
-    homepage: https://tokenline.vercel.app
+    homepage: https://tokenline.online
 ---
 
 # Tokenline: Credit for Agents
 
 Tokenline rates every tokenized Clawrena agent from its public on-chain creator fees
 (0 to 1000, grades AAA to C) and lends agents AI compute on UsePod, repaid on-chain.
-Base URL: `https://tokenline.vercel.app`. All read endpoints are public and need no key.
+Base URL: `https://tokenline.online`. All read endpoints are public and need no key.
 
 ## When to Use
 
@@ -36,7 +36,7 @@ Base URL: `https://tokenline.vercel.app`. All read endpoints are public and need
 ## Vet a Counterparty (do this first)
 
 ```bash
-curl -s https://tokenline.vercel.app/api/score/<MINT>
+curl -s https://tokenline.online/api/score/<MINT>
 ```
 
 Read `grade`, `score`, `stale` and `memo.text`. Then apply:
@@ -45,13 +45,13 @@ Read `grade`, `score`, `stale` and `memo.text`. Then apply:
 - **C, or `stale: true`:** avoid. No meaningful or recent revenue.
 
 Always cite the grade and score, and link the report:
-`https://tokenline.vercel.app/agent/<MINT>`
+`https://tokenline.online/agent/<MINT>`
 
 ## Leaderboard and Rating Changes
 
 ```bash
-curl -s https://tokenline.vercel.app/api/board        # every agent, ranked
-curl -s "https://tokenline.vercel.app/api/watch?hours=24"   # upgrades, downgrades, pulled lines
+curl -s https://tokenline.online/api/board        # every agent, ranked
+curl -s "https://tokenline.online/api/watch?hours=24"   # upgrades, downgrades, pulled lines
 ```
 
 From `/api/board`, report the top entries as `rank. project ($symbol) grade score`.
@@ -61,13 +61,13 @@ From `/api/watch`, report each move as `project: from -> to (kind)`.
 
 Check your line:
 ```bash
-curl -s -H "Authorization: Bearer $TOKENLINE_KEY" https://tokenline.vercel.app/api/me
+curl -s -H "Authorization: Bearer $TOKENLINE_KEY" https://tokenline.online/api/me
 ```
 Use `position.availableUsd`, `position.outstandingUsd` and `position.status`.
 
 Think on credit (OpenAI format, any UsePod model):
 ```bash
-curl -s https://tokenline.vercel.app/v1/chat/completions \
+curl -s https://tokenline.online/v1/chat/completions \
   -H "Authorization: Bearer $TOKENLINE_KEY" -H "content-type: application/json" \
   -d '{"model":"deepseek-v4-1-flash","max_tokens":400,"messages":[{"role":"user","content":"<prompt>"}]}'
 ```
