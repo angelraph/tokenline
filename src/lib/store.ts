@@ -122,8 +122,19 @@ class FileStore implements Store {
 
 // Postgres (prod)
 
+// Short in-memory caches so most requests never reach the database. Writes on this instance clear or update them
+// straight away; other instances see changes within the TTL, which is fine for scores, settings and the ledger.
+const KV_TTL = 60_000;
+const EVENTS_TTL = 30_000;
+const AGENTS_TTL = 60_000;
+
 class PgStore implements Store {
   private sql = postgres(config.databaseUrl, { max: 5, idle_timeout: 20, prepare: false });
+  private kvCache = new Map<string, { v: unknown; until: number }>();
+  private eventsCache = new Map<string, { v: LedgerEvent[]; until: number }>();
+  private agentsCache: { v: Agent[]; until: number } | null = null;
+  private clearAgents() { this.agentsCache = null; }
+  private clearEvents() { this.eventsCache.clear(); }
   private ready: Promise<void> | null = null;
 
   private init() {
@@ -156,6 +167,7 @@ class PgStore implements Store {
     const [r] = await this.sql`insert into tl_agents (id, name, wallet, mint, x_handle, key_hash, key_prefix, verified, frozen)
       values (${id}, ${a.name}, ${a.wallet}, ${a.mint}, ${a.xHandle}, ${a.keyHash}, ${a.keyPrefix}, ${a.verified}, ${a.frozen})
       returning *`;
+    this.clearAgents();
     return this.row(r);
   }
   async getAgent(id: string) {
@@ -174,8 +186,11 @@ class PgStore implements Store {
     return r ? this.row(r) : null;
   }
   async listAgents() {
+    if (this.agentsCache && this.agentsCache.until > Date.now()) return this.agentsCache.v;
     await this.init();
-    return (await this.sql`select * from tl_agents order by created_at`).map((r) => this.row(r));
+    const v = (await this.sql`select * from tl_agents order by created_at`).map((r) => this.row(r));
+    this.agentsCache = { v, until: Date.now() + AGENTS_TTL };
+    return v;
   }
   async updateAgent(id: string, p: Partial<Agent>) {
     await this.init();
@@ -184,6 +199,7 @@ class PgStore implements Store {
     const n = { ...cur, ...p };
     await this.sql`update tl_agents set name=${n.name}, mint=${n.mint}, x_handle=${n.xHandle}, key_hash=${n.keyHash},
       key_prefix=${n.keyPrefix}, verified=${n.verified}, frozen=${n.frozen} where id=${id}`;
+    this.clearAgents();
   }
   async addEvent(e: Omit<LedgerEvent, 'id' | 'at'> & { at?: string }) {
     await this.init();
@@ -191,18 +207,24 @@ class PgStore implements Store {
       values (${randomUUID()}, ${e.agentId}, ${e.type}, ${e.amountUsd}, ${e.asset}, ${e.amount}, ${e.txSig},
         ${e.meta ? this.sql.json(e.meta as any) : null}, ${e.at ?? new Date().toISOString()})
       on conflict do nothing returning id`;
+    if (rows.length) this.clearEvents();
     return rows.length > 0;
   }
   async listEvents(q: { agentId?: string; limit?: number } = {}) {
-    await this.init();
     const lim = q.limit ?? 500;
+    const key = `${q.agentId ?? '*'}|${lim}`;
+    const hit = this.eventsCache.get(key);
+    if (hit && hit.until > Date.now()) return hit.v;
+    await this.init();
     const rows = q.agentId
       ? await this.sql`select * from tl_events where agent_id = ${q.agentId} order by at desc limit ${lim}`
       : await this.sql`select * from tl_events order by at desc limit ${lim}`;
-    return rows.map((r) => ({
+    const v = rows.map((r) => ({
       id: r.id, agentId: r.agent_id, type: r.type, amountUsd: r.amount_usd, asset: r.asset, amount: r.amount,
       txSig: r.tx_sig, meta: r.meta, at: new Date(r.at).toISOString(),
     })) as LedgerEvent[];
+    this.eventsCache.set(key, { v, until: Date.now() + EVENTS_TTL });
+    return v;
   }
   async eventsForSignature(sig: string) {
     await this.init();
@@ -215,16 +237,22 @@ class PgStore implements Store {
   async deleteEvent(id: string) {
     await this.init();
     await this.sql`delete from tl_events where id = ${id}`;
+    this.clearEvents();
   }
   async getKv<T>(k: string) {
+    const hit = this.kvCache.get(k);
+    if (hit && hit.until > Date.now()) return hit.v as T | null;
     await this.init();
     const [r] = await this.sql`select v from tl_kv where k = ${k}`;
-    return (r?.v as T) ?? null;
+    const v = (r?.v as T) ?? null;
+    this.kvCache.set(k, { v, until: Date.now() + KV_TTL });
+    return v;
   }
   async setKv(k: string, v: unknown) {
     await this.init();
     await this.sql`insert into tl_kv (k, v) values (${k}, ${this.sql.json(v as any)})
       on conflict (k) do update set v = excluded.v`;
+    this.kvCache.set(k, { v, until: Date.now() + KV_TTL });
   }
 }
 

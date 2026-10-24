@@ -29,7 +29,20 @@ export type BoardRow = {
   outstandingUsd: number;
 };
 
-export async function board(): Promise<{ rows: BoardRow[]; solPriceUsd: number; projects: number; asOf: number | null }> {
+type BoardResult = { rows: BoardRow[]; solPriceUsd: number; projects: number; asOf: number | null };
+let boardCache: { v: BoardResult; until: number } | null = null;
+let boardInflight: Promise<BoardResult> | null = null;
+
+/** The scored board, computed at most once a minute per server instance to keep database reads low. */
+export async function board(): Promise<BoardResult> {
+  if (boardCache && boardCache.until > Date.now()) return boardCache.v;
+  boardInflight ??= computeBoard()
+    .then((v) => { boardCache = { v, until: Date.now() + 60_000 }; return v; })
+    .finally(() => { boardInflight = null; });
+  return boardInflight;
+}
+
+async function computeBoard(): Promise<BoardResult> {
   const [feed, agents, events, holders, signals, activity] = await Promise.all([
     getClawrena(), store.listAgents(), store.listEvents({ limit: 100_000 }), holderCache(), signalCaches(), activityCache(),
   ]);

@@ -11,7 +11,8 @@ type Snapshot = { at: number; s: Record<string, [number, number]> }; // mint -> 
 // v5: recency, momentum and age come from live trading activity after the feed closed.
 const KEY = 'watch:snapshots:v5';
 const EVERY_MS = 3_600_000;
-const KEEP_MS = 8 * 86_400_000;
+// Three days covers the 24 hour comparisons and the report charts while keeping the stored history small.
+const KEEP_MS = 3 * 86_400_000;
 
 export async function recordSnapshot(rows: BoardRow[]) {
   const snaps = (await store.getKv<Snapshot[]>(KEY)) ?? [];

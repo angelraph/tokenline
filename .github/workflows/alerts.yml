@@ -1,10 +1,10 @@
 name: Holder alerts
 
-# Vercel's free plan only runs scheduled jobs daily, so this checks the board every 30 minutes
+# Vercel's free plan only runs scheduled jobs daily, so this checks the board every hour
 # and sends Telegram alerts to $TOKENL holders when something changes.
 on:
   schedule:
-    - cron: "*/30 * * * *"
+    - cron: "7 * * * *"
   workflow_dispatch:
 
 jobs:
