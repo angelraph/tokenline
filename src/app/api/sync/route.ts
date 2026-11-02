@@ -40,7 +40,9 @@ async function run(req: Request) {
     // Every step shares one deadline so the job always finishes inside Vercel's 60 second limit.
     const deadline = Date.now() + 50_000;
     const left = (cap: number) => Math.max(0, Math.min(cap, deadline - Date.now()));
-    const chain = await syncOnchain();
+    const backfill = new URL(req.url).searchParams.get('backfill') === '1';
+    const chain = await syncOnchain({ backfill });
+    if (backfill) return ok(chain);
     const feed = await getClawrena();
     const mints = feed.projects.map((p) => p.mint);
     const activityChecked = feed.asOf ? await refreshActivity(mints, left(14_000)) : 0;

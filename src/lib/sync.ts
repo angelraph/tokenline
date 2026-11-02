@@ -3,6 +3,7 @@ import { addressTransactions, type EnhancedTx } from './helius';
 import { assetUsd } from './prices';
 import { store } from './store';
 import { classify, classifyAutoBuyback } from './classify';
+import { readHistory } from './paging';
 
 const DUST_USD = 0.001;
 
@@ -35,18 +36,33 @@ export async function ingest(txs: EnhancedTx[]) {
   return added;
 }
 
-/** Pull new transactions for the pool and escrow wallets since the last cursor. */
-export async function syncOnchain() {
+/**
+ * Pull every new transaction for the watched wallets since the last cursor. The cursor only moves after the
+ * transactions are saved and the whole gap was read, so a failure or a long outage can never skip any.
+ * `backfill` ignores the cursor on the auto-buyback wallets and re-reads them from the day auto-buyback began;
+ * entries are unique per transaction, so nothing is counted twice.
+ */
+export async function syncOnchain(opts: { backfill?: boolean } = {}) {
+  const auto = new Set(config.autoBuybackWallets);
   const addrs = [...new Set([config.poolWallet, config.escrowWallet, ...config.autoBuybackWallets].filter(Boolean))];
   if (!addrs.length) return { added: 0, note: 'POOL_WALLET not configured' };
   let added = 0;
+  let scanned = 0;
+  let incomplete = false;
   for (const addr of addrs) {
     const cursorKey = `cursor:${addr}`;
-    const until = (await store.getKv<string>(cursorKey)) ?? undefined;
-    const txs = await addressTransactions(addr, until);
-    if (txs.length) await store.setKv(cursorKey, txs[0].signature);
-    added += await ingest(txs);
+    const rewind = !!opts.backfill && auto.has(addr);
+    const until = rewind ? undefined : (await store.getKv<string>(cursorKey)) ?? undefined;
+    const { txs, complete } = await readHistory<EnhancedTx>(
+      (before) => addressTransactions(addr, until, before),
+      { until, sinceMs: auto.has(addr) && !until ? config.autoBuybackSince : 0 },
+    );
+    scanned += txs.length;
+    // Oldest first, so an interruption leaves only newer transactions to redo.
+    added += await ingest([...txs].reverse());
+    if (txs.length && complete) await store.setKv(cursorKey, txs[0].signature);
+    if (!complete) incomplete = true;
   }
   await store.setKv('lastSyncAt', new Date().toISOString());
-  return { added };
+  return { added, scanned, incomplete };
 }

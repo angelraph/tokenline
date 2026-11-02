@@ -79,12 +79,13 @@ export type EnhancedTx = {
 };
 
 /** Helius Enhanced Transactions for an address, newest first. Requires HELIUS_API_KEY. */
-export async function addressTransactions(address: string, until?: string): Promise<EnhancedTx[]> {
+export async function addressTransactions(address: string, until?: string, before?: string): Promise<EnhancedTx[]> {
   if (!config.heliusKey) throw new Error('HELIUS_API_KEY is required for on-chain sync');
   const u = new URL(`https://api.helius.xyz/v0/addresses/${address}/transactions`);
   u.searchParams.set('api-key', config.heliusKey);
   u.searchParams.set('limit', '100');
   if (until) u.searchParams.set('until', until);
+  if (before) u.searchParams.set('before', before);
   const res = await fetch(u, { signal: AbortSignal.timeout(20_000) });
   if (!res.ok) throw new Error(`helius ${res.status}: ${await res.text()}`);
   return (await res.json()) as EnhancedTx[];
